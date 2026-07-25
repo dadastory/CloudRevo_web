@@ -2,7 +2,8 @@ import { useTranslation } from "react-i18next";
 import { useRouteError } from "react-router-dom";
 
 function ErrorBoundary() {
-  let error = useRouteError();
+  const error = useRouteError();
+  const errorWithStack = error instanceof Error ? error : undefined;
   const { t } = useTranslation();
   const loader = document.getElementById("app-loader");
   if (loader) loader.style.display = "none";
@@ -17,9 +18,9 @@ function ErrorBoundary() {
           <pre>
             <code>{error.toString()}</code>
           </pre>
-          {error.stack && (
+          {errorWithStack?.stack && (
             <pre>
-              <code>{error.stack}</code>
+              <code>{errorWithStack.stack}</code>
             </pre>
           )}
         </details>

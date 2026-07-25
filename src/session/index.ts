@@ -81,7 +81,7 @@ export interface SessionState {
   anonymousUser?: User;
 }
 
-const SESSION_KEY = "cloudreve_session";
+const SESSION_KEY = "cloudrevo_session";
 
 export class Manager {
   private state: SessionState;

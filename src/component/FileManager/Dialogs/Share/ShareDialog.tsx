@@ -1,14 +1,17 @@
 import { Box, Checkbox, Collapse, DialogContent, IconButton, Stack, Tooltip, useTheme } from "@mui/material";
 import dayjs from "dayjs";
 import { TFunction } from "i18next";
+import { enqueueSnackbar } from "notistack";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { CSSTransition, SwitchTransition } from "react-transition-group";
 import { Share as ShareModel } from "../../../../api/explorer.ts";
-import { closeShareLinkDialog } from "../../../../redux/globalStateSlice.ts";
+import { GroupPermission } from "../../../../api/user.ts";
+import { closeShareLinkDialog, setFilePermissionDialog } from "../../../../redux/globalStateSlice.ts";
 import { useAppDispatch, useAppSelector } from "../../../../redux/hooks.ts";
 import { createOrUpdateShareLink } from "../../../../redux/thunks/share.ts";
 import { copyToClipboard, sendLink } from "../../../../util";
+import SessionManager from "../../../../session";
 import AutoHeight from "../../../Common/AutoHeight.tsx";
 import { FilledTextField, SmallFormControlLabel } from "../../../Common/StyledComponents.tsx";
 import DraggableDialog from "../../../Dialogs/DraggableDialog.tsx";
@@ -16,6 +19,7 @@ import CopyOutlined from "../../../Icons/CopyOutlined.tsx";
 import Share from "../../../Icons/Share.tsx";
 import { FileManagerIndex } from "../../FileManager.tsx";
 import ShareSettingContent, { downloadOptions, expireOptions, ShareSetting } from "./ShareSetting.tsx";
+import { canSetDefaultShare } from "./shareSettingRule.ts";
 
 const initialSetting: ShareSetting = {
   expires_val: expireOptions[2],
@@ -34,6 +38,7 @@ const shareToSetting = (share: ShareModel, t: TFunction): ShareSetting => {
     use_custom_password: true,
     share_view: share.share_view,
     show_readme: share.show_readme,
+    default: share.default,
     downloads: share.remain_downloads != undefined && share.remain_downloads > 0,
 
     expires_val: expireOptions[2],
@@ -125,6 +130,7 @@ const ShareDialog = () => {
           createOrUpdateShareLink(FileManagerIndex.main, target, setting, editTarget?.id),
         );
         setShareLink(shareLink);
+        enqueueSnackbar(t("application:modals.saved"), { variant: "success" });
       } catch (e) {
       } finally {
         setLoading(false);
@@ -191,6 +197,13 @@ const ShareDialog = () => {
                       onSettingChange={setSetting}
                       setting={setting}
                       file={target}
+                      canSetDefault={canSetDefaultShare(
+                        !!SessionManager.currentLoginOrNull(),
+                        SessionManager.currentUserGroupPermission().enabled(GroupPermission.is_admin),
+                      )}
+                      onOpenPermissions={() => {
+                        if (target) dispatch(setFilePermissionDialog({ open: true, file: target }));
+                      }}
                     />
                   )}
                   {shareLink && (

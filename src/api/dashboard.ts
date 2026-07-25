@@ -16,7 +16,6 @@ export interface MetricsSummary {
 
 export interface Version {
   version: string;
-  pro: boolean;
   commit: string;
 }
 
@@ -24,10 +23,6 @@ export interface HomepageSummary {
   metrics_summary?: MetricsSummary;
   site_urls: string[];
   version: Version;
-}
-
-export interface ManualRefreshLicenseService {
-  license: string;
 }
 
 export interface GetSettingService {
@@ -57,7 +52,7 @@ export interface GroupSetting {
   decompress_size?: number;
   remote_download_options?: Record<string, any>;
   source_batch?: number;
-  aria2_batch?: number;
+  remote_download_batch?: number;
   max_walked_files?: number;
   trash_retention?: number;
   redirected_source?: boolean;
@@ -173,7 +168,7 @@ export interface Node extends CommonMixin {
 
 export enum DownloaderProvider {
   qbittorrent = "qbittorrent",
-  aria2 = "aria2",
+  gopeed = "gopeed",
 }
 
 export interface QBittorrentSetting {
@@ -184,10 +179,11 @@ export interface QBittorrentSetting {
   temp_path?: string;
 }
 
-export interface Aria2Setting {
+export interface GopeedSetting {
   server?: string;
   token?: string;
   options?: Record<string, string>;
+  download_path?: string;
   temp_path?: string;
 }
 
@@ -200,7 +196,7 @@ export interface URLValidationSetting {
 export interface NodeSetting {
   provider?: DownloaderProvider;
   qbittorrent?: QBittorrentSetting;
-  aria2?: Aria2Setting;
+  gopeed?: GopeedSetting;
   interval?: number;
   wait_for_seeding?: boolean;
   url_validation?: URLValidationSetting;
@@ -550,6 +546,8 @@ export interface Share extends CommonMixin {
   downloads?: number;
   expires?: string;
   remain_downloads?: number;
+  is_default?: boolean;
+  props?: ShareProps;
   edges: {
     user?: User;
     file?: File;
@@ -557,6 +555,10 @@ export interface Share extends CommonMixin {
 
   user_hash_id?: string;
   share_link?: string;
+}
+
+export interface ShareProps {
+  default?: boolean;
 }
 
 export interface ListShareResponse {

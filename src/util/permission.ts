@@ -5,6 +5,9 @@ import CrUri, { Filesystem } from "./uri.ts";
 export function canCopyMoveTo(files: FileResponse[], dst: string, isCopy: boolean): boolean {
   const dstUri = new CrUri(dst);
   const srcUri = new CrUri(files[0].path);
+  if (srcUri.fs() == Filesystem.share || dstUri.fs() == Filesystem.share) {
+    return srcUri.fs() == Filesystem.share && dstUri.fs() == Filesystem.share && srcUri.id() == dstUri.id();
+  }
   if (isCopy) {
     return srcUri.fs() == dstUri.fs() && srcUri.fs() == Filesystem.my;
   } else {

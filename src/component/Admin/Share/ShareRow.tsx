@@ -1,4 +1,4 @@
-import { Box, Checkbox, IconButton, Link, Skeleton, TableCell, TableRow } from "@mui/material";
+import { Box, Checkbox, Chip, IconButton, Link, Skeleton, Switch, TableCell, TableRow } from "@mui/material";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
@@ -12,7 +12,7 @@ import { ShareExpires } from "../../FileManager/TopBar/ShareInfoPopover";
 import Delete from "../../Icons/Delete";
 import Open from "../../Icons/Open";
 import { confirmOperation } from "../../../redux/thunks/dialog";
-import { batchDeleteShares } from "../../../api/api";
+import { batchDeleteShares, setShareDefault } from "../../../api/api";
 
 export interface ShareRowProps {
   share?: Share;
@@ -24,6 +24,7 @@ export interface ShareRowProps {
   onSelect?: (id: number) => void;
   openUserDialog?: (id: number) => void;
   openFileDialog?: (id: number) => void;
+  onDefaultChanged?: () => void;
 }
 
 const ShareRow = ({
@@ -36,12 +37,14 @@ const ShareRow = ({
   onSelect,
   openUserDialog,
   openFileDialog,
+  onDefaultChanged,
 }: ShareRowProps) => {
   const navigate = useNavigate();
-  const { t } = useTranslation("dashboard");
+  const { t } = useTranslation(["dashboard", "application"]);
   const dispatch = useAppDispatch();
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [openLoading, setOpenLoading] = useState(false);
+  const [defaultLoading, setDefaultLoading] = useState(false);
   const onRowClick = () => {
     onDetails?.(share?.id ?? 0);
   };
@@ -134,6 +137,15 @@ const ShareRow = ({
     window.open(share?.share_link ?? "", "_blank");
   };
 
+  const onDefaultChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    e.stopPropagation();
+    if (!share) return;
+    setDefaultLoading(true);
+    dispatch(setShareDefault(share.id, e.target.checked))
+      .then(() => onDefaultChanged?.())
+      .finally(() => setDefaultLoading(false));
+  };
+
   return (
     <TableRow hover key={share?.id} sx={{ cursor: "pointer" }} onClick={onRowClick} selected={selected}>
       <TableCell padding="checkbox">
@@ -147,7 +159,26 @@ const ShareRow = ({
         />
       </TableCell>
       <NoWrapTableCell>
-        <NoWrapTypography variant="inherit">{share?.id}</NoWrapTypography>
+        <Box sx={{ display: "flex", alignItems: "center", gap: 0.75 }}>
+          <NoWrapTypography variant="inherit">{share?.id}</NoWrapTypography>
+          {share?.props?.default && (
+            <Chip
+              color="primary"
+              label={t("modals.defaultShare", { ns: "application" })}
+              size="small"
+              sx={{ height: 20, fontWeight: 600 }}
+            />
+          )}
+
+          <Switch
+            checked={share?.is_default ?? share?.props?.default ?? false}
+            disabled={defaultLoading || deleteLoading || deleting}
+            size="small"
+            inputProps={{ "aria-label": t("modals.defaultShare", { ns: "application" }) }}
+            onClick={stopPropagation}
+            onChange={onDefaultChange}
+          />
+        </Box>
       </NoWrapTableCell>
       <TableCell>
         {share?.edges?.file ? (
@@ -168,9 +199,6 @@ const ShareRow = ({
       </NoWrapTableCell>
       <NoWrapTableCell>
         <NoWrapTypography variant="inherit">{share?.downloads ?? 0}</NoWrapTypography>
-      </NoWrapTableCell>
-      <NoWrapTableCell>
-        <NoWrapTypography variant="inherit">{share?.price}</NoWrapTypography>
       </NoWrapTableCell>
       <TableCell>
         <ShareExpires expires={share?.expires} remain_downloads={share?.remain_downloads} />

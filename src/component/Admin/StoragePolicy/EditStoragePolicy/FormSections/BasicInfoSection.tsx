@@ -466,7 +466,7 @@ const BasicInfoSection = () => {
               sx={{ mt: 1 }}
               onClick={handleCreateCors}
             >
-              {t("policy.letCloudreveHelpMe")}
+              {t("policy.letCloudRevoHelpMe")}
             </SecondaryButton>
           </SettingForm>
         )}

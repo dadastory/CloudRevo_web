@@ -156,6 +156,10 @@ export interface GlobalStateSlice {
   manageShareDialogOpen?: boolean;
   manageShareDialogFile?: FileResponse;
 
+  // File-level share permission dialog
+  filePermissionDialogOpen?: boolean;
+  filePermissionDialogFile?: FileResponse;
+
   // Stale version action dialog
   staleVersionDialogOpen?: boolean;
   staleVersionUri?: string;
@@ -405,6 +409,7 @@ export const globalStateSlice = createSlice({
       state.shareLinkDialogOpen = state.shareLinkDialogOpen ? false : undefined;
       state.versionControlDialogOpen = state.versionControlDialogOpen ? false : undefined;
       state.manageShareDialogOpen = state.manageShareDialogOpen ? false : undefined;
+      state.filePermissionDialogOpen = state.filePermissionDialogOpen ? false : undefined;
       state.createNewDialogOpen = state.createNewDialogOpen ? false : undefined;
       state.selectOptionDialogOpen = state.selectOptionDialogOpen ? false : undefined;
       state.batchDownloadLogDialogOpen = state.batchDownloadLogDialogOpen ? false : undefined;
@@ -771,6 +776,14 @@ export const globalStateSlice = createSlice({
     closeManageShareDialog: (state) => {
       state.manageShareDialogOpen = false;
     },
+    setFilePermissionDialog: (state, action: PayloadAction<{ open: boolean; file?: FileResponse }>) => {
+      state.filePermissionDialogOpen = action.payload.open;
+      state.filePermissionDialogFile = action.payload.file;
+    },
+    closeFilePermissionDialog: (state) => {
+      state.filePermissionDialogOpen = false;
+      state.filePermissionDialogFile = undefined;
+    },
     setImageViewer: (state, action: PayloadAction<ImageViewerState>) => {
       state.imageViewer = action.payload;
     },
@@ -898,6 +911,8 @@ export const {
   closeImageViewer,
   setManageShareDialog,
   closeManageShareDialog,
+  setFilePermissionDialog,
+  closeFilePermissionDialog,
   setVersionControlDialog,
   closeVersionControlDialog,
   closeSidebar,

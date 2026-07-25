@@ -1,10 +1,10 @@
 import { SvgIconProps, Typography } from "@mui/material";
 
-export interface EmojiIconProps extends SvgIconProps {
+export interface EmojiIconProps extends Pick<SvgIconProps, "sx" | "fontSize"> {
   emoji: string;
 }
 
-const EmojiIcon = ({ sx, fontSize, emoji, ...rest }: EmojiIconProps) => {
+const EmojiIcon = ({ sx, fontSize, emoji }: EmojiIconProps) => {
   return (
     <Typography
       sx={{
@@ -14,7 +14,6 @@ const EmojiIcon = ({ sx, fontSize, emoji, ...rest }: EmojiIconProps) => {
         ...sx,
       }}
       fontSize={fontSize}
-      {...rest}
     >
       {emoji}
     </Typography>

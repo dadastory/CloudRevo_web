@@ -7,7 +7,6 @@ import CrUri, { Filesystem } from "../../../util/uri";
 import TaskSummaryTitle from "../../Pages/Tasks/TaskSummaryTitle";
 
 export const userTaskTypes: string[] = [
-  TaskType.relocate,
   TaskType.create_archive,
   TaskType.extract_archive,
   TaskType.remote_download,

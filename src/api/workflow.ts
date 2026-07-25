@@ -101,6 +101,24 @@ export interface DownloadWorkflowService {
   src?: string[];
   src_file?: string;
   dst: string;
+  request?: RemoteDownloadRequestOptions;
+  gopeed?: RemoteDownloadTaskOptions;
+  display_name?: string;
+  selected_files?: number[];
+}
+
+export interface RemoteDownloadRequestOptions {
+  method?: "GET" | "POST";
+  headers?: Record<string, string>;
+  body?: string;
+}
+
+export interface RemoteDownloadTaskOptions {
+  connections: number;
+}
+
+export interface BatchDownloadTaskService {
+  ids: string[];
 }
 
 export interface ImportWorkflowService {

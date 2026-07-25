@@ -27,6 +27,7 @@ import ClockArrowDownload from "../../../Icons/ClockArrowDownload.tsx";
 import Eye from "../../../Icons/Eye.tsx";
 import TableSettingsOutlined from "../../../Icons/TableSettings.tsx";
 import Timer from "../../../Icons/Timer.tsx";
+import { normalizeDefaultShareSetting } from "./shareSettingRule.ts";
 
 const Accordion = styled(MuiAccordion)(() => ({
   border: "0px solid rgba(0, 0, 0, .125)",
@@ -79,6 +80,7 @@ export interface ShareSetting {
   password?: string;
   share_view?: boolean;
   show_readme?: boolean;
+  default?: boolean;
   downloads?: boolean;
   expires?: boolean;
 
@@ -90,6 +92,8 @@ export interface ShareSettingProps {
   setting: ShareSetting;
   file?: FileResponse;
   onSettingChange: (value: ShareSetting) => void;
+  onOpenPermissions?: () => void;
+  canSetDefault?: boolean;
   editing?: boolean;
 }
 
@@ -123,7 +127,7 @@ const isNumeric = (num: any) =>
 
 const filter = createFilterOptions<valueOption>();
 
-const ShareSettingContent = ({ setting, file, editing, onSettingChange }: ShareSettingProps) => {
+const ShareSettingContent = ({ setting, file, editing, onSettingChange, onOpenPermissions, canSetDefault }: ShareSettingProps) => {
   const { t } = useTranslation();
 
   const [expanded, setExpanded] = useState<string | undefined>(undefined);
@@ -132,13 +136,15 @@ const ShareSettingContent = ({ setting, file, editing, onSettingChange }: ShareS
     setExpanded(isExpanded ? panel : undefined);
   };
 
-  const handleCheck = (prop: "is_private" | "share_view" | "show_readme" | "expires" | "downloads") => () => {
-    if (!setting[prop]) {
-      handleExpand(prop)(null, true);
-    }
+  const handleCheck =
+    (prop: "is_private" | "share_view" | "show_readme" | "expires" | "downloads") => () => {
+      if (!setting[prop]) {
+        handleExpand(prop)(null, true);
+      }
 
-    onSettingChange({ ...setting, [prop]: !setting[prop] });
-  };
+      const next = { ...setting, [prop]: !setting[prop] };
+      onSettingChange(prop === "is_private" ? normalizeDefaultShareSetting(next, "is_private") : next);
+    };
 
   return (
     <List
@@ -234,6 +240,28 @@ const ShareSettingContent = ({ setting, file, editing, onSettingChange }: ShareS
           </Accordion>
         </>
       )}
+      {file && (
+        <StyledListItemButton onClick={onOpenPermissions}>
+          <ListItemIcon>
+            <TableSettingsOutlined />
+          </ListItemIcon>
+          <ListItemText primary={t("application:modals.filePermissions")} />
+        </StyledListItemButton>
+      )}
+      {canSetDefault && <Accordion expanded={expanded === "default"} onChange={handleExpand("default")}>
+        <AccordionSummary aria-controls="default-share-content" id="default-share-header">
+          <StyledListItemButton>
+            <ListItemIcon>
+              <TableSettingsOutlined />
+            </ListItemIcon>
+            <ListItemText primary={t("application:modals.defaultShare")} />
+            <ListItemSecondaryAction>
+              <Checkbox checked={!!setting.default} onChange={() => onSettingChange(normalizeDefaultShareSetting({ ...setting, default: !setting.default }, "default"))} />
+            </ListItemSecondaryAction>
+          </StyledListItemButton>
+        </AccordionSummary>
+        <AccordionDetails>{t("application:modals.defaultShareDes")}</AccordionDetails>
+      </Accordion>}
       <Accordion expanded={expanded === "expires"} onChange={handleExpand("expires")}>
         <AccordionSummary aria-controls="panel1a-content" id="panel1a-header">
           <StyledListItemButton>

@@ -8,9 +8,7 @@ import { DenseAutocomplete, DenseFilledTextField, NoWrapBox, SquareChip } from "
 import FileTypeIcon from "../../FileManager/Explorer/FileTypeIcon.tsx";
 import LinkDismiss from "../../Icons/LinkDismiss.tsx";
 
-export interface SharesInputProps {}
-
-const SharesInput = (props: SharesInputProps) => {
+const SharesInput = () => {
   const theme = useTheme();
   const { t } = useTranslation();
   const [options, setOptions] = useState<number[]>([]);

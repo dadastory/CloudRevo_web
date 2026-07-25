@@ -76,7 +76,7 @@ const AppPromotion = () => {
                   {t("setting.downloadOurApp")}
                 </Typography>
                 <Box marginTop={1}>
-                  <Box component={"a"} href={"https://apps.apple.com/us/app/cloudreve/id1619480823"} target={"_blank"}>
+                  <Box component={"a"} href={"https://apps.apple.com/us/app/cloudrevo/id1619480823"} target={"_blank"}>
                     <Box component={"img"} src={"/static/img/appstore.svg"} />
                   </Box>
                 </Box>
@@ -145,9 +145,8 @@ const AppPromotion = () => {
               <Box>
                 <Box
                   component={"img"}
-                  src={"https://cloudreve.org/imgs/ios/766shots_so.png"}
+                  src={"https://github.com/dadastory/CloudRevo"}
                   alt="Image Description"
-                  effect="blur"
                   width={1}
                   height={1}
                   sx={{

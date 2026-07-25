@@ -11,6 +11,7 @@ import {
   FolderSummary,
   Metadata,
 } from "../../../api/explorer.ts";
+import { setFilePermissionDialog } from "../../../redux/globalStateSlice.ts";
 import { useAppDispatch, useAppSelector } from "../../../redux/hooks.ts";
 import SessionManager from "../../../session/index.ts";
 import { sizeToString } from "../../../util";
@@ -124,7 +125,7 @@ const BasicInfo = ({ target }: BasicInfoProps) => {
   const [viewSetting, setViewSetting] = useState<ExplorerView | undefined>(undefined);
 
   useEffect(() => {
-    setViewSetting(target?.extended_info?.view);
+	setViewSetting(target?.extended_info?.view);
   }, [target]);
 
   const isSymbolicLink = useMemo(() => {
@@ -394,6 +395,19 @@ const BasicInfo = ({ target }: BasicInfoProps) => {
             ) : (
               t("application:fileManager.notSet")
             )
+          }
+        />
+      )}
+      {target.owned && !isSymbolicLink && (
+        <InfoRow
+          title={t("application:fileManager.sharePermissions")}
+          content={
+            <Link href="#" onClick={(event) => {
+              event.preventDefault();
+              dispatch(setFilePermissionDialog({ open: true, file: target }));
+            }} underline="hover">
+              {target.access_rule ? t("application:fileManager.configured") : t("application:fileManager.notSet")}
+            </Link>
           }
         />
       )}

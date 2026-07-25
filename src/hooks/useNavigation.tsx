@@ -12,9 +12,9 @@ import { useQuery } from "../util";
 import { Filesystem } from "../util/uri.ts";
 
 const pathQueryKey = "path";
-export const defaultPath = "cloudreve://my";
-export const defaultTrashPath = "cloudreve://trash";
-export const defaultSharedWithMePath = "cloudreve://" + Filesystem.shared_with_me;
+export const defaultPath = "cloudrevo://my";
+export const defaultTrashPath = "cloudrevo://trash";
+export const defaultSharedWithMePath = "cloudrevo://" + Filesystem.shared_with_me;
 
 const useNavigation = (index: number, initialPath?: string) => {
   const dispatch = useAppDispatch();

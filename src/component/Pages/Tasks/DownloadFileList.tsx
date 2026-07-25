@@ -173,7 +173,12 @@ const DownloadFileList = ({ taskId, summary, downloading, readonly }: DownloadFi
                       {...props}
                       key={index}
                       sx={{
-                        background: `linear-gradient(to right, ${progressColor} 0%,${progressColor} ${percentage}%,${progressBgColor} ${percentage}%,${progressBgColor} 100%)`,
+                        backgroundColor: progressBgColor,
+                        backgroundImage: `linear-gradient(to right, ${progressColor}, ${progressColor})`,
+                        backgroundPosition: "left",
+                        backgroundRepeat: "no-repeat",
+                        backgroundSize: `${percentage}% 100%`,
+                        transition: "background-size 4.5s linear",
                       }}
                     />
                   );

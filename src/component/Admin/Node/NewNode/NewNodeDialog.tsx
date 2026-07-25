@@ -33,9 +33,9 @@ const defaultNode: Node = {
   capabilities: "",
   weight: 1,
   settings: {
-    provider: DownloaderProvider.aria2,
+    provider: DownloaderProvider.gopeed,
     qbittorrent: {},
-    aria2: {},
+    gopeed: {},
     interval: 5,
   },
   edges: {

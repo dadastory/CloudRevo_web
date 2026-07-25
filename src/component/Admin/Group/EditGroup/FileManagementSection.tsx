@@ -1,5 +1,4 @@
 import {
-  Box,
   CircularProgress,
   Collapse,
   FormControl,
@@ -18,8 +17,7 @@ import { GroupPermission } from "../../../../api/user";
 import Boolset from "../../../../util/boolset";
 import SizeInput from "../../../Common/SizeInput";
 import { DenseFilledTextField } from "../../../Common/StyledComponents";
-import SettingForm, { ProChip } from "../../../Pages/Setting/SettingForm";
-import ProDialog from "../../Common/ProDialog";
+import SettingForm from "../../../Pages/Setting/SettingForm";
 import { NoMarginHelperText, SettingSection, SettingSectionContent } from "../../Settings/Settings";
 import { AnonymousGroupID } from "../GroupRow";
 import { GroupSettingContext } from "./GroupSettingWrapper";
@@ -30,7 +28,6 @@ const MonacoEditor = lazy(() => import("../../../Viewers/CodeViewer/MonacoEditor
 const FileManagementSection = () => {
   const { t } = useTranslation("dashboard");
   const { values, setGroup } = useContext(GroupSettingContext);
-  const [proOpen, setProOpen] = useState(false);
   const theme = useTheme();
 
   const [editedConfig, setEditedConfig] = useState("");
@@ -114,11 +111,14 @@ const FileManagementSection = () => {
     [editedConfig, setGroup],
   );
 
-  const onAria2BatchSizeChange = useCallback(
+  const onRemoteDownloadBatchSizeChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       setGroup((p: GroupEnt) => ({
         ...p,
-        settings: { ...p.settings, aria2_batch: parseInt(e.target.value) ? parseInt(e.target.value) : undefined },
+        settings: {
+          ...p.settings,
+          remote_download_batch: parseInt(e.target.value) ? parseInt(e.target.value) : undefined,
+        },
       }));
     },
     [setGroup],
@@ -154,14 +154,8 @@ const FileManagementSection = () => {
     [setGroup],
   );
 
-  const onProClick = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
-    e.stopPropagation();
-    setProOpen(true);
-  }, []);
-
   return (
     <SettingSection>
-      <ProDialog open={proOpen} onClose={() => setProOpen(false)} />
       <Typography variant="h6" gutterBottom>
         {t("group.fileManagement")}
       </Typography>
@@ -195,20 +189,6 @@ const FileManagementSection = () => {
                 </FormControl>
               </SettingForm>
             </Collapse>
-            <SettingForm lgWidth={5}>
-              <FormControl fullWidth onClick={onProClick}>
-                <FormControlLabel
-                  control={<Switch checked={false} />}
-                  label={
-                    <Box sx={{ display: "flex", alignItems: "center" }}>
-                      {t("group.migratePolicy")}
-                      <ProChip size="small" label="Pro" />
-                    </Box>
-                  }
-                />
-                <NoMarginHelperText>{t("group.migratePolicyDes")}</NoMarginHelperText>
-              </FormControl>
-            </SettingForm>
             <SettingForm lgWidth={5}>
               <FormControl fullWidth>
                 <FormControlLabel
@@ -271,7 +251,7 @@ const FileManagementSection = () => {
             </SettingForm>
             <Collapse in={permission.enabled(GroupPermission.remote_download)} unmountOnExit>
               <Stack spacing={3}>
-                <SettingForm title={t("group.aria2Options")} lgWidth={5}>
+                <SettingForm title={t("group.downloaderOptions")} lgWidth={5}>
                   <FormControl fullWidth>
                     <Suspense fallback={<CircularProgress />}>
                       <MonacoEditor
@@ -289,10 +269,10 @@ const FileManagementSection = () => {
                         }}
                       />
                     </Suspense>
-                    <NoMarginHelperText>{t("group.aria2OptionsDes")}</NoMarginHelperText>
+                    <NoMarginHelperText>{t("group.downloaderOptionsDes")}</NoMarginHelperText>
                   </FormControl>
                 </SettingForm>
-                <SettingForm title={t("group.aria2BatchSize")} lgWidth={5}>
+                <SettingForm title={t("group.remoteDownloadBatchSize")} lgWidth={5}>
                   <FormControl fullWidth>
                     <DenseFilledTextField
                       slotProps={{
@@ -301,10 +281,10 @@ const FileManagementSection = () => {
                           min: 0,
                         },
                       }}
-                      value={values.settings?.aria2_batch ?? 0}
-                      onChange={onAria2BatchSizeChange}
+                      value={values.settings?.remote_download_batch ?? 0}
+                      onChange={onRemoteDownloadBatchSizeChange}
                     />
-                    <NoMarginHelperText>{t("group.aria2BatchSizeDes")}</NoMarginHelperText>
+                    <NoMarginHelperText>{t("group.remoteDownloadBatchSizeDes")}</NoMarginHelperText>
                   </FormControl>
                 </SettingForm>
               </Stack>
@@ -327,20 +307,6 @@ const FileManagementSection = () => {
               <FormControl fullWidth>
                 <MultipleNodeSelectionInput />
                 <NoMarginHelperText>{t("group.allowedNodesDes")}</NoMarginHelperText>
-              </FormControl>
-            </SettingForm>
-            <SettingForm lgWidth={5}>
-              <FormControl fullWidth onClick={onProClick}>
-                <FormControlLabel
-                  control={<Switch checked={false} />}
-                  label={
-                    <Box sx={{ display: "flex", alignItems: "center" }}>
-                      {t("group.allowSelectNode")}
-                      <ProChip size="small" label="Pro" />
-                    </Box>
-                  }
-                />
-                <NoMarginHelperText>{t("group.allowSelectNodeDes")}</NoMarginHelperText>
               </FormControl>
             </SettingForm>
           </>

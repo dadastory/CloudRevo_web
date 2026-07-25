@@ -46,7 +46,13 @@ const TaskDetail = ({ task, downloading }: TaskDetailProps) => {
             })}
           </Alert>
         )}
-        {task.status == TaskStatus.error && <Alert severity={"error"}>{task.error}</Alert>}
+        {task.status == TaskStatus.error && (
+          <Alert severity={"error"}>
+            {task.error?.includes("HTTP 403")
+              ? t("download.sourceForbidden")
+              : task.error}
+          </Alert>
+        )}
         <TaskProgress
           taskId={task.id}
           taskStatus={task.status}

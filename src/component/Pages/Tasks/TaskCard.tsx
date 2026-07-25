@@ -1,12 +1,15 @@
 import {
   Box,
+  Checkbox,
   darken,
+  IconButton,
   lighten,
   Skeleton,
   styled,
   SvgIconProps,
   Theme,
   Typography,
+  Tooltip,
   useMediaQuery,
   useTheme,
 } from "@mui/material";
@@ -18,13 +21,14 @@ import { useTranslation } from "react-i18next";
 import { useInView } from "react-intersection-observer";
 import { FileType } from "../../../api/explorer.ts";
 import { TaskResponse, TaskType } from "../../../api/workflow.ts";
-import { useAppDispatch } from "../../../redux/hooks.ts";
 import { DefaultButton } from "../../Common/StyledComponents.tsx";
 import FileIcon from "../../FileManager/Explorer/FileIcon.tsx";
 import Archive from "../../Icons/Archive.tsx";
 import ArchiveArrow from "../../Icons/ArchiveArrow.tsx";
 import ArrowImport from "../../Icons/ArrowImport.tsx";
-import StorageOutlined from "../../Icons/StorageOutlined.tsx";
+import Dismiss from "../../Icons/Dismiss.tsx";
+import Delete from "../../Icons/Delete.tsx";
+import ArrowSync from "../../Icons/ArrowSync.tsx";
 import TaskDetail from "./TaskDetail.tsx";
 import TaskSummaryStatus from "./TaskSummaryStatus.tsx";
 import TaskSummaryTitle from "./TaskSummaryTitle.tsx";
@@ -45,7 +49,8 @@ const Accordion = styled((props: AccordionProps) => <MuiAccordion disableGutters
       display: "none",
     },
     boxShadow: expanded ? `0 0 0 1px ${theme.palette.divider}` : "none",
-    transition: "all 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms",
+    position: "relative",
+    overflow: "hidden",
     marginBottom: theme.spacing(1),
   };
 });
@@ -83,8 +88,17 @@ export const SummaryButton = styled(DefaultButton)<{
     borderRadius: expanded
       ? `${theme.shape.borderRadius}px ${theme.shape.borderRadius}px 0 0`
       : `${theme.shape.borderRadius}px`,
-    backgroundColor: bgColor,
-    background: `linear-gradient(to right, ${progressColor} 0%,${progressColor} ${percentage}%,${progressBgColor} ${percentage}%,${progressBgColor} 100%)`,
+    backgroundColor: progressBgColor,
+    "&::before": {
+      content: '""',
+      position: "absolute",
+      inset: 0,
+      width: `${percentage}%`,
+      backgroundColor: progressColor,
+      pointerEvents: "none",
+      transition: "width 4.5s linear",
+    },
+    "& > *": { position: "relative" },
     "&:hover": {
       backgroundColor: theme.palette.mode == "light" ? "rgba(0, 0, 0, 0.09)" : "rgba(255, 255, 255, 0.13)",
     },
@@ -96,6 +110,12 @@ export interface TaskCardProps {
   showProgress?: boolean;
   task?: TaskResponse;
   onLoad?: () => void;
+  selected?: boolean;
+  onSelect?: (task: TaskResponse) => void;
+  onRetry?: (task: TaskResponse) => void;
+  onDelete?: (task: TaskResponse) => void;
+  onCancel?: (task: TaskResponse) => void;
+  actionLoading?: boolean;
 }
 
 const taskIconsMap: {
@@ -103,15 +123,24 @@ const taskIconsMap: {
 } = {
   [TaskType.create_archive]: Archive,
   [TaskType.extract_archive]: ArchiveArrow,
-  [TaskType.relocate]: StorageOutlined,
   [TaskType.import]: ArrowImport,
 };
 
-const TaskCard = ({ loading, showProgress, onLoad, task }: TaskCardProps) => {
+const TaskCard = ({
+  loading,
+  showProgress,
+  onLoad,
+  task,
+  selected,
+  onSelect,
+  onRetry,
+  onDelete,
+  onCancel,
+  actionLoading,
+}: TaskCardProps) => {
   const { t } = useTranslation();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
-  const dispatch = useAppDispatch();
   const { ref, inView } = useInView({
     rootMargin: "200px 0px",
     triggerOnce: true,
@@ -182,23 +211,41 @@ const TaskCard = ({ loading, showProgress, onLoad, task }: TaskCardProps) => {
               justifyContent: "space-between",
             }}
           >
-            <Typography
-              variant={"inherit"}
+            <Box
               sx={{
                 flexGrow: 1,
                 wordBreak: "break-all",
+                minWidth: 0,
               }}
             >
               {loading || !task ? (
                 <Skeleton variant={"text"} width={150} />
               ) : (
-                <Box component={"span"} sx={{ verticalAlign: "sub" }}>
-                  <TaskSummaryTitle type={task.type} summary={task.summary} />
+                <Box component={"span"} sx={{ display: "flex", alignItems: "center", minWidth: 0 }}>
+                  {onSelect && (
+                    <Checkbox
+                      checked={selected}
+                      size="small"
+                      onClick={(event) => event.stopPropagation()}
+                      onChange={() => onSelect(task)}
+                      inputProps={{ "aria-label": t("download.selectTask") }}
+                    />
+                  )}
+                  <Box sx={{ minWidth: 0, flexGrow: 1 }}>
+                    <Box component={"span"} sx={{ verticalAlign: "sub" }}>
+                      <TaskSummaryTitle type={task.type} summary={task.summary} />
+                    </Box>
+                    {!!task.summary?.props?.src_str && (
+                      <Typography variant="caption" color="text.secondary" noWrap display="block">
+                        {task.summary.props.src_str}
+                      </Typography>
+                    )}
+                  </Box>
                 </Box>
               )}
-            </Typography>
+            </Box>
 
-            <Typography color={"text.secondary"} variant={"inherit"} sx={{ display: "flex", alignItems: "center" }}>
+            <Box color={"text.secondary"} sx={{ display: "flex", alignItems: "center", flexShrink: 0 }}>
               {loading || !task ? (
                 <Skeleton variant={"text"} width={50} />
               ) : (
@@ -210,7 +257,57 @@ const TaskCard = ({ loading, showProgress, onLoad, task }: TaskCardProps) => {
                   summary={task.summary}
                 />
               )}
-            </Typography>
+              {!loading && task && onRetry && task.status === "error" && (
+                <Tooltip title={t("download.retryTask")}>
+                  <span>
+                    <IconButton
+                      size="small"
+                      disabled={actionLoading}
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        onRetry(task);
+                      }}
+                    >
+                      <ArrowSync fontSize="small" />
+                    </IconButton>
+                  </span>
+                </Tooltip>
+              )}
+              {!loading && task && onCancel && task.status === "queued" && (
+                <Tooltip title={t("download.cancelTask")}>
+                  <span>
+                    <IconButton
+                      size="small"
+                      color="error"
+                      disabled={actionLoading}
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        onCancel(task);
+                      }}
+                    >
+                      <Dismiss fontSize="small" />
+                    </IconButton>
+                  </span>
+                </Tooltip>
+              )}
+              {!loading && task && onDelete && (
+                <Tooltip title={t("download.deleteRecord")}>
+                  <span>
+                    <IconButton
+                      size="small"
+                      color="error"
+                      disabled={actionLoading}
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        onDelete(task);
+                      }}
+                    >
+                      <Delete fontSize="small" />
+                    </IconButton>
+                  </span>
+                </Tooltip>
+              )}
+            </Box>
           </Box>
         </SummaryButton>
       </AccordionSummary>

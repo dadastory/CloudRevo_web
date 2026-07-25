@@ -5,6 +5,7 @@ import { closeContextMenu } from "../../../redux/fileManagerSlice.ts";
 import {
   setCreateArchiveDialog,
   setDirectLinkManagementDialog,
+  setFilePermissionDialog,
   setManageShareDialog,
   setVersionControlDialog,
 } from "../../../redux/globalStateSlice.ts";
@@ -15,6 +16,7 @@ import BranchForkLink from "../../Icons/BranchForkLink.tsx";
 import HistoryOutlined from "../../Icons/HistoryOutlined.tsx";
 import ImageArrowCounterclockwise from "../../Icons/ImageAarowCounterclockwise.tsx";
 import LinkSetting from "../../Icons/LinkSetting.tsx";
+import ShieldLockFilled from "../../Icons/ShieldLockFilled.tsx";
 import { CascadingContext, CascadingMenuItem } from "./CascadingMenu.tsx";
 import { SubMenuItemsProps } from "./OrganizeMenuItems.tsx";
 
@@ -71,6 +73,23 @@ const MoreMenuItems = ({ displayOpt, targets }: SubMenuItemsProps) => {
             <BranchForkLink fontSize="small" />
           </ListItemIcon>
           <ListItemText>{t("application:fileManager.manageShares")}</ListItemText>
+        </CascadingMenuItem>
+      )}
+      {displayOpt.showFilePermissions && (
+        <CascadingMenuItem
+          onClick={onClick(() =>
+            dispatch(
+              setFilePermissionDialog({
+                open: true,
+                file: targets[0],
+              }),
+            ),
+          )}
+        >
+          <ListItemIcon>
+            <ShieldLockFilled fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>{t("application:modals.filePermissions")}</ListItemText>
         </CascadingMenuItem>
       )}
       {displayOpt.showDirectLinkManagement && (

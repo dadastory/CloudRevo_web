@@ -216,13 +216,11 @@ export const getColumnTypeDefaults = (
   isMobile?: boolean,
   customProps?: CustomProps[],
 ): ColumTypeDefaults => {
-  if (ColumnTypeDefaults[c.type]) {
+  const defaults = ColumnTypeDefaults[c.type];
+  if (defaults) {
     return {
-      ...ColumnTypeDefaults[c.type],
-      width:
-        isMobile && ColumnTypeDefaults[c.type].widthMobile
-          ? ColumnTypeDefaults[c.type].widthMobile
-          : ColumnTypeDefaults[c.type].width,
+      ...defaults,
+      width: isMobile && defaults.widthMobile ? defaults.widthMobile : defaults.width,
     };
   }
 

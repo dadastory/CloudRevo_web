@@ -52,7 +52,7 @@
     "40012": "Index de fragment non valide. ({{message}})",
     "40013": "Longueur du contenu non valide. ({{message}})",
     "40014": "Limite de taille de lot dépassée pour l'obtention du lien source.",
-    "40015": "Limite de taille de lot aria2 dépassée.",
+    "40015": "Limite de taille de lot de téléchargement distant dépassée.",
     "40016": "Chemin non trouvé.",
     "40017": "Ce compte a été bloqué.",
     "40018": "Ce compte n'est pas activé.",

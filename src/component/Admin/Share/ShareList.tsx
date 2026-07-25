@@ -40,6 +40,7 @@ import ShareRow from "./ShareRow";
 
 export const UserQuery = "user";
 export const FileQuery = "file";
+export const ShareIDQuery = "share";
 
 const ShareList = () => {
   const { t } = useTranslation("dashboard");
@@ -58,6 +59,7 @@ const ShareList = () => {
   const [orderDirection, setOrderDirection] = useQueryState(OrderDirectionQuery, { defaultValue: "desc" });
   const [user, setUser] = useQueryState(UserQuery, { defaultValue: "" });
   const [file, setFile] = useQueryState(FileQuery, { defaultValue: "" });
+  const [shareID, setShareID] = useQueryState(ShareIDQuery, { defaultValue: "" });
 
   const [count, setCount] = useState(0);
   const [selected, setSelected] = useState<readonly number[]>([]);
@@ -80,11 +82,12 @@ const ShareList = () => {
   const clearFilters = useCallback(() => {
     setUser("");
     setFile("");
-  }, [setUser, setFile]);
+    setShareID("");
+  }, [setUser, setFile, setShareID]);
 
   useEffect(() => {
     fetchShares();
-  }, [page, pageSize, orderBy, orderDirection, user, file]);
+  }, [page, pageSize, orderBy, orderDirection, user, file, shareID]);
 
   const fetchShares = () => {
     setLoading(true);
@@ -98,6 +101,7 @@ const ShareList = () => {
       conditions: {
         share_file_id: file,
         share_user_id: user,
+        share_id: shareID,
       },
     };
 
@@ -168,8 +172,8 @@ const ShareList = () => {
   };
 
   const hasActiveFilters = useMemo(() => {
-    return !!(user || file);
-  }, [user, file]);
+    return !!(user || file || shareID);
+  }, [user, file, shareID]);
 
   const handleUserDialogOpen = (id: number) => {
     setUserDialogID(id);
@@ -200,6 +204,8 @@ const ShareList = () => {
             setUser={setUser}
             file={file}
             setFile={setFile}
+            shareID={shareID}
+            setShareID={setShareID}
             clearFilters={clearFilters}
           />
 
@@ -305,6 +311,7 @@ const ShareList = () => {
                     openUserDialog={handleUserDialogOpen}
                     openFileDialog={handleOpenFile}
                     onDetails={handleOpenShare}
+                    onDefaultChanged={fetchShares}
                   />
                 ))}
               {loading &&

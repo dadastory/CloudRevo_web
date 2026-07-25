@@ -66,10 +66,10 @@ const PolicySelectionInput = ({ value, onChange }: PolicySelectionInputProps) =>
             },
           },
         }}
-        renderValue={(selected: number) => (
+        renderValue={(selected) => (
           <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
             {!loading ? (
-              <SquareChip size="small" key={selected} label={policyMap[selected]?.name} />
+              <SquareChip size="small" key={Number(selected)} label={policyMap[Number(selected)]?.name} />
             ) : (
               <FacebookCircularProgress size={20} sx={{ mt: "1px" }} />
             )}

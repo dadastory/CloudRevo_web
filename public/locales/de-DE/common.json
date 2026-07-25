@@ -52,7 +52,7 @@
     "40012": "Ungültiger Chunk-Index. ({{message}})",
     "40013": "Ungültige Inhaltslänge. ({{message}})",
     "40014": "Batch-Größenlimit für das Abrufen von Quelllinks überschritten.",
-    "40015": "Aria2-Batch-Größenlimit überschritten.",
+    "40015": "Remote-Download-Batchgrößenlimit überschritten.",
     "40016": "Pfad nicht gefunden.",
     "40017": "Dieses Konto wurde gesperrt.",
     "40018": "Dieses Konto ist nicht aktiviert.",

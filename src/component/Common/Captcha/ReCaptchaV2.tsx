@@ -25,8 +25,12 @@ window.recaptchaOptions = {
 const ReCaptchaV2 = ({ onStateChange, generation, ...rest }: ReCaptchaV2Props) => {
   const theme = useTheme();
 
-  const captchaRef = useRef();
+  const captchaRef = useRef<ReCAPTCHA>(null);
   const reCaptchaKey = useAppSelector((state) => state.siteConfig.basic.config.captcha_ReCaptchaKey);
+
+  if (!reCaptchaKey) {
+    return null;
+  }
 
   const refreshCaptcha = async () => {
     captchaRef.current?.reset();

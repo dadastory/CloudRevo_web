@@ -124,9 +124,9 @@ const generators: GeneratorRenderProps[] = [
     ],
   },
   {
-    name: "cloudreveBuiltin",
+    name: "cloudrevoBuiltin",
     maxSizeSetting: "thumb_builtin_max_size",
-    des: "cloudreveBuiltinDes",
+    des: "cloudrevoBuiltinDes",
     enableFlag: "thumb_builtin_enabled",
   },
 ];

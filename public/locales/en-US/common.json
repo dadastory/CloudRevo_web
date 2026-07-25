@@ -52,7 +52,7 @@
     "40012": "Invalid chunk index. ({{message}})",
     "40013": "Invalid content length. ({{message}})",
     "40014": "Exceed batch size limit of getting source link.",
-    "40015": "Exceed aria2 batch size limit.",
+    "40015": "Remote download batch size limit exceeded.",
     "40016": "Path not found.",
     "40017": "This account has been blocked.",
     "40018": "This account is not activated.",

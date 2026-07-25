@@ -39,7 +39,7 @@ const CapabilitiesSection = () => {
   const dispatch = useAppDispatch();
   const { enqueueSnackbar } = useSnackbar();
 
-  const [editedConfigAria2, setEditedConfigAria2] = useState("");
+  const [editedConfigGopeed, setEditedConfigGopeed] = useState("");
   const [editedConfigQbittorrent, setEditedConfigQbittorrent] = useState("");
   const [testDownloaderLoading, setTestDownloaderLoading] = useState(false);
   const [storeFilesHintDialogOpen, setStoreFilesHintDialogOpen] = useState(false);
@@ -53,10 +53,10 @@ const CapabilitiesSection = () => {
   }, [capabilities]);
 
   useEffect(() => {
-    setEditedConfigAria2(
-      values.settings?.aria2?.options ? JSON.stringify(values.settings?.aria2?.options, null, 2) : "",
+    setEditedConfigGopeed(
+      values.settings?.gopeed?.options ? JSON.stringify(values.settings?.gopeed?.options, null, 2) : "",
     );
-  }, [values.settings?.aria2?.options]);
+  }, [values.settings?.gopeed?.options]);
 
   useEffect(() => {
     setEditedConfigQbittorrent(
@@ -88,14 +88,14 @@ const CapabilitiesSection = () => {
     [setNode],
   );
 
-  const onAria2ServerChange = useCallback(
+  const onGopeedServerChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       setNode((p: Node) => ({
         ...p,
         settings: {
           ...p.settings,
-          aria2: {
-            ...p.settings?.aria2,
+          gopeed: {
+            ...p.settings?.gopeed,
             server: e.target.value,
           },
         },
@@ -104,14 +104,14 @@ const CapabilitiesSection = () => {
     [setNode],
   );
 
-  const onAria2TokenChange = useCallback(
+  const onGopeedTokenChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       setNode((p: Node) => ({
         ...p,
         settings: {
           ...p.settings,
-          aria2: {
-            ...p.settings?.aria2,
+          gopeed: {
+            ...p.settings?.gopeed,
             token: e.target.value,
           },
         },
@@ -120,15 +120,31 @@ const CapabilitiesSection = () => {
     [setNode],
   );
 
-  const onAria2TempPathChange = useCallback(
+  const onGopeedTempPathChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       setNode((p: Node) => ({
         ...p,
         settings: {
           ...p.settings,
-          aria2: {
-            ...p.settings?.aria2,
+          gopeed: {
+            ...p.settings?.gopeed,
             temp_path: e.target.value ? e.target.value : undefined,
+          },
+        },
+      }));
+    },
+    [setNode],
+  );
+
+  const onGopeedDownloadPathChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setNode((p: Node) => ({
+        ...p,
+        settings: {
+          ...p.settings,
+          gopeed: {
+            ...p.settings?.gopeed,
+            download_path: e.target.value,
           },
         },
       }));
@@ -293,7 +309,7 @@ const CapabilitiesSection = () => {
     [urlValidation?.allowed_cidrs],
   );
 
-  const onEditedConfigAria2Blur = useCallback(
+  const onEditedConfigGopeedBlur = useCallback(
     (value: string) => {
       var res: Record<string, any> | undefined = undefined;
       if (value) {
@@ -303,9 +319,9 @@ const CapabilitiesSection = () => {
           console.error(e);
         }
       }
-      setNode((p: Node) => ({ ...p, settings: { ...p.settings, aria2: { ...p.settings?.aria2, options: res } } }));
+      setNode((p: Node) => ({ ...p, settings: { ...p.settings, gopeed: { ...p.settings?.gopeed, options: res } } }));
     },
-    [editedConfigAria2, setNode],
+    [editedConfigGopeed, setNode],
   );
 
   const onEditedConfigQbittorrentBlur = useCallback(
@@ -429,7 +445,7 @@ const CapabilitiesSection = () => {
             {t("node.remoteDownload")}
             <IconButton
               onClick={() => {
-                window.open("https://docs.cloudreve.org/usage/remote-download", "_blank");
+                window.open("https://github.com/dadastory/CloudRevo", "_blank");
               }}
             >
               <QuestionCircle />
@@ -438,9 +454,9 @@ const CapabilitiesSection = () => {
           <SettingSectionContent>
             <SettingForm title={t("node.downloader")} lgWidth={5}>
               <FormControl fullWidth>
-                <DenseSelect value={values.settings?.provider || DownloaderProvider.aria2} onChange={onProviderChange}>
-                  <SquareMenuItem value={DownloaderProvider.aria2}>
-                    <ListItemText primary="Aria2" slotProps={{ primary: { variant: "body2" } }} />
+                <DenseSelect value={values.settings?.provider || DownloaderProvider.gopeed} onChange={onProviderChange}>
+                  <SquareMenuItem value={DownloaderProvider.gopeed}>
+                    <ListItemText primary="Gopeed" slotProps={{ primary: { variant: "body2" } }} />
                   </SquareMenuItem>
                   <SquareMenuItem value={DownloaderProvider.qbittorrent}>
                     <ListItemText primary="qBittorrent" slotProps={{ primary: { variant: "body2" } }} />
@@ -449,20 +465,20 @@ const CapabilitiesSection = () => {
                 <NoMarginHelperText>
                   {values.settings?.provider === DownloaderProvider.qbittorrent
                     ? t("node.qbittorrentDes")
-                    : t("node.aria2Des")}
+                    : t("node.gopeedDes")}
                 </NoMarginHelperText>
               </FormControl>
             </SettingForm>
 
-            {values.settings?.provider === DownloaderProvider.aria2 && (
+            {values.settings?.provider === DownloaderProvider.gopeed && (
               <>
                 <SettingForm title={t("node.rpcServer")} lgWidth={5}>
                   <FormControl fullWidth>
                     <EndpointInput
                       fullWidth
                       required
-                      value={values.settings?.aria2?.server || ""}
-                      onChange={onAria2ServerChange}
+                      value={values.settings?.gopeed?.server || ""}
+                      onChange={onGopeedServerChange}
                       variant={"outlined"}
                     />
                     <NoMarginHelperText>
@@ -472,21 +488,22 @@ const CapabilitiesSection = () => {
                 </SettingForm>
                 <SettingForm title={t("node.rpcToken")} lgWidth={5}>
                   <FormControl fullWidth>
-                    <DenseFilledTextField value={values.settings?.aria2?.token || ""} onChange={onAria2TokenChange} />
+                    <DenseFilledTextField value={values.settings?.gopeed?.token || ""} onChange={onGopeedTokenChange} />
                     <NoMarginHelperText>
                       <Trans i18nKey="node.rpcTokenDes" ns="dashboard" components={[<Code />]} />
                     </NoMarginHelperText>
+                    <NoMarginHelperText>{t("node.gopeedComposeTokenDes")}</NoMarginHelperText>
                   </FormControl>
                 </SettingForm>
-                <SettingForm title={t("group.aria2Options")} lgWidth={5}>
+                <SettingForm title={t("group.downloaderOptions")} lgWidth={5}>
                   <FormControl fullWidth>
                     <Suspense fallback={<CircularProgress />}>
                       <MonacoEditor
                         theme={theme.palette.mode === "dark" ? "vs-dark" : "vs"}
                         language="json"
-                        value={editedConfigAria2}
-                        onChange={(value) => setEditedConfigAria2(value || "")}
-                        onBlur={onEditedConfigAria2Blur}
+                        value={editedConfigGopeed}
+                        onChange={(value) => setEditedConfigGopeed(value || "")}
+                        onBlur={onEditedConfigGopeedBlur}
                         height="200px"
                         minHeight="200px"
                         options={{
@@ -501,17 +518,28 @@ const CapabilitiesSection = () => {
                         i18nKey="node.downloaderOptionDes"
                         ns="dashboard"
                         components={[
-                          <Link href="https://aria2.github.io/manual/en/html/aria2c.html#id2" target="_blank" />,
+                          <Link href="https://github.com/GopeedLab/gopeed/blob/main/docs/usage.md" target="_blank" />,
                         ]}
                       />
                     </NoMarginHelperText>
                   </FormControl>
                 </SettingForm>
+                <SettingForm title={t("node.gopeedDownloadPath")} lgWidth={5}>
+                  <FormControl fullWidth>
+                    <DenseFilledTextField
+                      required
+                      value={values.settings?.gopeed?.download_path || ""}
+                      onChange={onGopeedDownloadPathChange}
+                    />
+                    <NoMarginHelperText>{t("node.gopeedDownloadPathDes")}</NoMarginHelperText>
+                  </FormControl>
+                </SettingForm>
                 <SettingForm title={t("node.tempPath")} lgWidth={5}>
                   <FormControl fullWidth>
                     <DenseFilledTextField
-                      value={values.settings?.aria2?.temp_path || ""}
-                      onChange={onAria2TempPathChange}
+                      required
+                      value={values.settings?.gopeed?.temp_path || ""}
+                      onChange={onGopeedTempPathChange}
                     />
                     <NoMarginHelperText>{t("node.tempPathDes")}</NoMarginHelperText>
                   </FormControl>
@@ -552,7 +580,7 @@ const CapabilitiesSection = () => {
                     <NoMarginHelperText>{t("node.webUICredDes")}</NoMarginHelperText>
                   </FormControl>
                 </SettingForm>
-                <SettingForm title={t("group.aria2Options")} lgWidth={5}>
+                <SettingForm title={t("group.downloaderOptions")} lgWidth={5}>
                   <FormControl fullWidth>
                     <Suspense fallback={<CircularProgress />}>
                       <MonacoEditor

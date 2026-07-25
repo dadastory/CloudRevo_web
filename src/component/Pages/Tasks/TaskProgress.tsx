@@ -91,28 +91,6 @@ const stepOptions: {
       },
     ],
   ],
-  [TaskType.relocate]: [
-    // Master
-    [
-      queueingStep,
-      {
-        title: "setting.indexingFiles",
-        state: "",
-        description: "setting.indexingFilesDes",
-      },
-      {
-        title: "setting.transferring",
-        state: "transfer",
-        description: "setting.transferringRelocateDes",
-        supportProgress: true,
-      },
-      {
-        title: "setting.committingChanges",
-        state: "finish",
-        description: "setting.relocateFinishing",
-      },
-    ],
-  ],
   [TaskType.extract_archive]: [
     // Master
     [

@@ -63,6 +63,7 @@ import {
   MultipleUriService,
   PatchMetadataService,
   PatchViewSyncService,
+  PatchShareAccessRuleService,
   PinFileService,
   RenameFileService,
   Share,
@@ -98,11 +99,14 @@ import {
   SignUpService,
   Token,
   TwoFALoginRequest,
+  Group,
   User,
   UserSettings,
 } from "./user.ts";
 import {
   ArchiveWorkflowService,
+  BatchDownloadTaskService,
+  DownloadTaskStatus,
   DownloadWorkflowService,
   ImportWorkflowService,
   ListTaskService,
@@ -508,6 +512,20 @@ export function getSearchUser(keyword: string): ThunkResponse<User[]> {
   };
 }
 
+export function getSearchShareGroups(keyword: string): ThunkResponse<Group[]> {
+  return async (dispatch, _getState) => {
+    return await dispatch(
+      send("/user/groups/search?keyword=" + encodeURIComponent(keyword), { method: "GET" }, { ...defaultOpts }),
+    );
+  };
+}
+
+export function resolveShareGroups(ids: string[]): ThunkResponse<Group[]> {
+  return async (dispatch, _getState) => {
+    return await dispatch(send("/user/groups/resolve", { method: "POST", data: { ids } }, { ...defaultOpts }));
+  };
+}
+
 export function sendCreateShare(req: ShareCreateService): ThunkResponse<string> {
   return async (dispatch, _getState) => {
     return await dispatch(
@@ -907,6 +925,18 @@ export function sendCreateRemoteDownload(req: DownloadWorkflowService): ThunkRes
   };
 }
 
+export function sendPreviewRemoteDownload(req: DownloadWorkflowService): ThunkResponse<DownloadTaskStatus> {
+  return async (dispatch, _getState) => {
+    return await dispatch(
+      send(
+        "/workflow/download/preview",
+        { data: req, method: "POST" },
+        { ...defaultOpts },
+      ),
+    );
+  };
+}
+
 export function sendSetDownloadTarget(id: string, req: SetDownloadFilesService): ThunkResponse {
   return async (dispatch, _getState) => {
     return await dispatch(
@@ -930,6 +960,56 @@ export function sendCancelDownloadTask(id: string): ThunkResponse {
       send(
         "/workflow/download/" + id,
         {
+          method: "DELETE",
+        },
+        {
+          ...defaultOpts,
+        },
+      ),
+    );
+  };
+}
+
+export function sendRetryDownloadTask(id: string): ThunkResponse<TaskResponse> {
+  return async (dispatch, _getState) => {
+    return await dispatch(
+      send(
+        "/workflow/download/" + id + "/retry",
+        {
+          method: "POST",
+        },
+        {
+          ...defaultOpts,
+        },
+      ),
+    );
+  };
+}
+
+export function sendRetryDownloadTasks(req: BatchDownloadTaskService): ThunkResponse<TaskResponse[]> {
+  return async (dispatch, _getState) => {
+    return await dispatch(
+      send(
+        "/workflow/download/batch/retry",
+        {
+          data: req,
+          method: "POST",
+        },
+        {
+          ...defaultOpts,
+        },
+      ),
+    );
+  };
+}
+
+export function sendDeleteDownloadTasks(req: BatchDownloadTaskService): ThunkResponse {
+  return async (dispatch, _getState) => {
+    return await dispatch(
+      send(
+        "/workflow/download/batch",
+        {
+          data: req,
           method: "DELETE",
         },
         {
@@ -1964,6 +2044,14 @@ export function getShareDetail(id: number): ThunkResponse<ShareEnt> {
   };
 }
 
+export function setShareDefault(id: number, isDefault: boolean): ThunkResponse<void> {
+  return async (dispatch, _getState) => {
+    return await dispatch(
+      send(`/admin/share/${id}/default`, { method: "PUT", data: { default: isDefault } }, { ...defaultOpts }),
+    );
+  };
+}
+
 export function batchDeleteShares(args: BatchIDService): ThunkResponse<void> {
   return async (dispatch, _getState) => {
     return await dispatch(
@@ -2023,6 +2111,12 @@ export function sendPatchViewSync(args: PatchViewSyncService): ThunkResponse<voi
   };
 }
 
+export function sendPatchShareAccessRule(args: PatchShareAccessRuleService): ThunkResponse<void> {
+  return async (dispatch, _getState) => {
+    return await dispatch(send(`/file/share-access-rule`, { method: "PATCH", data: args }, { ...defaultOpts }));
+  };
+}
+
 export function sendCleanupTask(args: CleanupTaskService): ThunkResponse<void> {
   return async (dispatch, _getState) => {
     return await dispatch(
@@ -2060,7 +2154,7 @@ export function getOauthAppRegistration(app_id: string): ThunkResponse<AppRegist
 export function sendConsentOauthApp(args: GrantService): ThunkResponse<GrantResponse> {
   return async (dispatch, _getState) => {
     return await dispatch(
-      send(`/session/oauth/consent`, { method: "POST", data: args }, { bypassSnackbar: (e) => true, ...defaultOpts }),
+      send(`/session/oauth/consent`, { method: "POST", data: args }, { bypassSnackbar: (_e) => true, ...defaultOpts }),
     );
   };
 }

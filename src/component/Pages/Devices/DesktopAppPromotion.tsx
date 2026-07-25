@@ -118,7 +118,7 @@ const DesktopAppPromotion = () => {
           >
             <Box
               component={"img"}
-              src={"https://cloudreve.org/imgs/desktop/explorer.png"}
+              src={"https://github.com/dadastory/CloudRevo"}
               alt="Windows Explorer Integration"
               sx={{
                 width: "100%",
@@ -148,7 +148,7 @@ const DesktopAppPromotion = () => {
           >
             <Box
               component={"img"}
-              src={"https://cloudreve.org/imgs/desktop/sync-ui.png"}
+              src={"https://github.com/dadastory/CloudRevo"}
               alt="Sync UI"
               sx={{
                 width: "100%",

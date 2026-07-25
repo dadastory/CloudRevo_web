@@ -26,10 +26,12 @@ export const canShowInfo = (cap: Boolset) => {
 };
 
 export const canUpdate = (opt: DisplayOption) => {
+	const canUpdateSharedFile = opt.isShareFileSystem && opt.orCapability?.enabled(NavigatorCapability.version_control);
+	const canUpdateOwnedFile = !opt.isShareFileSystem && opt.orCapability?.enabled(NavigatorCapability.upload_file);
   return !!(
     opt.allUpdatable &&
     opt.hasFile &&
-    opt.orCapability?.enabled(NavigatorCapability.upload_file) &&
+    (canUpdateSharedFile || canUpdateOwnedFile) &&
     opt.allUpdatable
   );
 };
@@ -46,6 +48,7 @@ export interface DisplayOption {
   hasFolder?: boolean;
   hasOwned?: boolean;
   hasFailedThumb?: boolean;
+  isShareFileSystem?: boolean;
 
   showEnter?: boolean;
   showOpen?: boolean;
@@ -77,6 +80,7 @@ export interface DisplayOption {
   showVersionControl?: boolean;
   showDirectLinkManagement?: boolean;
   showManageShares?: boolean;
+  showFilePermissions?: boolean;
   showCreateArchive?: boolean;
   showResetThumb?: boolean;
 
@@ -117,7 +121,10 @@ export const getActionOpt = (
     }
 
     const parentCap = new Boolset(parent.capability);
-    display.showCreateFolder = parentCap.enabled(NavigatorCapability.create_file) && parent.owned;
+    const sharedFolderWrite =
+      new CrUri(parent.path).fs() == Filesystem.share && parentCap.enabled(NavigatorCapability.create_file);
+    display.showCreateFolder =
+      parentCap.enabled(NavigatorCapability.create_file) && (parent.owned || sharedFolderWrite);
     display.showCreateFile = display.showCreateFolder && fmIndex == FileManagerIndex.main;
     display.showUpload = display.showCreateFile;
     if (display.showCreateFile) {
@@ -138,9 +145,18 @@ export const getActionOpt = (
   }
 
   const parentUrl = new CrUri(targets?.[0]?.path ?? defaultPath);
+  display.isShareFileSystem = parentUrl.fs() == Filesystem.share;
   targets.forEach((target) => {
-    let readable = true;
-    let updatable = target.owned && parentUrl.fs() != Filesystem.share;
+    const readable = true;
+    const targetCapability = target.capability ? new Boolset(target.capability) : undefined;
+    const shareWritable =
+      parentUrl.fs() == Filesystem.share &&
+      !!targetCapability &&
+      (targetCapability.enabled(NavigatorCapability.rename_file) ||
+        targetCapability.enabled(NavigatorCapability.version_control) ||
+        targetCapability.enabled(NavigatorCapability.delete_file) ||
+        targetCapability.enabled(NavigatorCapability.soft_delete));
+    const updatable = target.owned || shareWritable;
 
     if (display.allReadable && !readable) {
       display.allReadable = false;
@@ -198,7 +214,8 @@ export const getActionOpt = (
   });
 
   const firstFileSuffix = fileExtension(targets[0]?.name ?? "");
-  display.showPin = !display.hasTrashFile && targets.length == 1 && display.hasFolder;
+  display.showPin =
+    !display.hasTrashFile && targets.length == 1 && display.hasFolder && parentUrl.fs() != Filesystem.share;
   display.showDelete =
     display.hasUpdatable &&
     display.orCapability &&
@@ -210,7 +227,11 @@ export const getActionOpt = (
     display.allUpdatable &&
     display.orCapability &&
     display.orCapability.enabled(NavigatorCapability.rename_file);
-  display.showCopy = display.hasUpdatable && !!display.orCapability;
+  const sharedCopySource =
+    display.isShareFileSystem && display.allReadable && !!display.orCapability?.enabled(NavigatorCapability.download_file);
+  const sharedMoveSource =
+    display.isShareFileSystem && display.hasUpdatable && !!display.orCapability?.enabled(NavigatorCapability.delete_file);
+  display.showCopy = display.isShareFileSystem ? sharedCopySource : display.hasUpdatable && !!display.orCapability;
   display.showShare =
     targets.length == 1 &&
     !!currentUser &&
@@ -221,7 +242,7 @@ export const getActionOpt = (
     display.orCapability.enabled(NavigatorCapability.share) &&
     (!targets[0].metadata ||
       (!targets[0].metadata[Metadata.share_redirect] && !targets[0].metadata[Metadata.restore_uri]));
-  display.showMove = display.hasUpdatable && !!display.orCapability;
+  display.showMove = display.isShareFileSystem ? sharedMoveSource : display.hasUpdatable && !!display.orCapability;
   display.showTags =
     display.hasUpdatable && display.orCapability && display.orCapability.enabled(NavigatorCapability.update_metadata);
   display.showChangeFolderColor =
@@ -291,6 +312,12 @@ export const getActionOpt = (
     !!currentUser &&
     groupBs.enabled(GroupPermission.share) &&
     display.orCapability.enabled(NavigatorCapability.share);
+  display.showFilePermissions =
+    targets.length === 1 &&
+    !!currentUser &&
+    !display.isShareFileSystem &&
+    !targets[0].metadata?.[Metadata.share_redirect] &&
+    (targets[0].owned || groupBs.enabled(GroupPermission.is_admin));
   display.showCreateArchive =
     display.hasReadable &&
     !!currentUser &&
@@ -308,6 +335,7 @@ export const getActionOpt = (
   display.showMore =
     display.showVersionControl ||
     display.showManageShares ||
+    display.showFilePermissions ||
     display.showCreateArchive ||
     display.showDirectLinkManagement ||
     display.showResetThumb;

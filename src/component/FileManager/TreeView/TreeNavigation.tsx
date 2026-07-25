@@ -96,26 +96,26 @@ const TreeNavigation = React.memo(
                         <TreeFiles
                           flatten
                           level={0}
-                          path={"cloudreve://my/?category=image"}
-                          key={"cloudreve://my/?category=image"}
+                          path={"cloudrevo://my/?category=image"}
+                          key={"cloudrevo://my/?category=image"}
                         />
                         <TreeFiles
                           flatten
                           level={0}
-                          path={"cloudreve://my/?category=video"}
-                          key={"cloudreve://my/?category=video"}
+                          path={"cloudrevo://my/?category=video"}
+                          key={"cloudrevo://my/?category=video"}
                         />
                         <TreeFiles
                           flatten
                           level={0}
-                          path={"cloudreve://my/?category=audio"}
-                          key={"cloudreve://my/?category=audio"}
+                          path={"cloudrevo://my/?category=audio"}
+                          key={"cloudrevo://my/?category=audio"}
                         />
                         <TreeFiles
                           flatten
                           level={0}
-                          path={"cloudreve://my/?category=document"}
-                          key={"cloudreve://my/?category=document"}
+                          path={"cloudrevo://my/?category=document"}
+                          key={"cloudrevo://my/?category=document"}
                         />
                       </>
                     )}

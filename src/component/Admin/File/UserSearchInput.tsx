@@ -1,11 +1,10 @@
-import { Box, createFilterOptions, debounce, useTheme } from "@mui/material";
+import { Autocomplete, Box, createFilterOptions, debounce, useTheme } from "@mui/material";
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { getSearchUser } from "../../../api/api.ts";
 import { User } from "../../../api/user.ts";
 import { useAppDispatch } from "../../../redux/hooks.ts";
 import {
-  DenseAutocomplete,
   DenseFilledTextField,
   NoWrapBox,
   NoWrapTypography,
@@ -69,7 +68,7 @@ const UserSearchInput = (props: UserSearchInputProps) => {
   }, []);
 
   return (
-    <DenseAutocomplete
+    <Autocomplete<User, false, false, false>
       value={value}
       filterOptions={filterOptions}
       options={options}

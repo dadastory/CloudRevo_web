@@ -35,6 +35,7 @@ export interface FileResponse {
   folder_summary?: FolderSummary;
   extended_info?: ExtendedInfo;
   primary_entity?: string;
+  access_rule?: ShareAccessRule;
 }
 
 export interface FolderSummary {
@@ -90,6 +91,21 @@ export interface Share {
   source_uri?: string;
   password?: string;
   show_readme?: boolean;
+  default?: boolean;
+}
+
+export interface SharePermission {
+  read?: boolean;
+  update?: boolean;
+  create?: boolean;
+  delete?: boolean;
+}
+
+export interface ShareAccessRule {
+  anonymous?: SharePermission;
+  authenticated?: SharePermission;
+  users?: Record<string, SharePermission>;
+  groups?: Record<string, SharePermission>;
 }
 
 export enum PolicyType {
@@ -308,6 +324,7 @@ export interface ShareCreateService {
   expire?: number;
   share_view?: boolean;
   show_readme?: boolean;
+  default?: boolean;
 }
 
 export interface CreateFileService {
@@ -553,6 +570,11 @@ export interface DirectLink {
 export interface PatchViewSyncService {
   uri: string;
   view?: ExplorerView;
+}
+
+export interface PatchShareAccessRuleService {
+  uri: string;
+  access_rule?: ShareAccessRule;
 }
 
 export interface CustomProps {

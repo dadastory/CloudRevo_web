@@ -63,7 +63,7 @@ const FileEncryptionSection = () => {
                 ns="dashboard"
                 components={[
                   <Link
-                    href="https://docs.cloudreve.org/usage/file-encryption#rotate-master-encryption-key"
+                    href="https://github.com/dadastory/CloudRevo"
                     target="_blank"
                   />,
                 ]}

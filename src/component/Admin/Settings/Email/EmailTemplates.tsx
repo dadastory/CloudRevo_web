@@ -1,11 +1,10 @@
 import { ExpandMoreRounded } from "@mui/icons-material";
 import { Box, Typography } from "@mui/material";
 import AccordionDetails from "@mui/material/AccordionDetails";
-import React, { useContext, useState } from "react";
+import React, { useContext } from "react";
 import { useTranslation } from "react-i18next";
-import SettingForm, { ProChip } from "../../../Pages/Setting/SettingForm.tsx";
+import SettingForm from "../../../Pages/Setting/SettingForm.tsx";
 import { MagicVar } from "../../Common/MagicVarDialog.tsx";
-import ProDialog from "../../Common/ProDialog.tsx";
 import { SettingContext } from "../SettingWrapper.tsx";
 import { SettingSection, SettingSectionContent } from "../Settings.tsx";
 import { AccordionSummary, StyledAccordion } from "../UserSession/SSOSettings.tsx";
@@ -22,12 +21,12 @@ const commonMagicVars: MagicVar[] = [
   {
     value: "settings.mainTitle",
     name: "{{ .CommonContext.SiteBasic.Name }}",
-    example: "Cloudreve",
+    example: "CloudRevo",
   },
   {
     value: "settings.siteDescription",
     name: "{{ .CommonContext.SiteBasic.Description }}",
-    example: "Another Cloudreve instance",
+    example: "Another CloudRevo instance",
   },
   {
     value: "settings.siteID",
@@ -37,17 +36,17 @@ const commonMagicVars: MagicVar[] = [
   {
     value: "settings.logo",
     name: "{{ .CommonContext.Logo.Normal }}",
-    example: "https://cloudreve.org/logo.svg",
+    example: "https://github.com/dadastory/CloudRevo",
   },
   {
     value: "settings.logo",
     name: "{{ .CommonContext.Logo.Light }}",
-    example: "https://cloudreve.org/logo_light.svg",
+    example: "https://github.com/dadastory/CloudRevo",
   },
   {
     value: "settings.siteURL",
     name: "{{ .CommonContext.SiteUrl }}",
-    example: "https://cloudreve.org",
+    example: "https://github.com/dadastory/CloudRevo",
   },
 ];
 
@@ -60,7 +59,7 @@ const userMagicVars: MagicVar[] = [
   {
     value: "application:login.email",
     name: "{{ .User.Email }}",
-    example: "example@cloudreve.org",
+    example: "example@example.com",
   },
   {
     value: "application:setting.nickname",
@@ -77,7 +76,6 @@ const userMagicVars: MagicVar[] = [
 const EmailTemplates: React.FC = () => {
   const { t } = useTranslation("dashboard");
   const { setSettings, values } = useContext(SettingContext);
-  const [proOpen, setProOpen] = useState(false);
 
   // Template setting keys
   const templateSettings = [
@@ -97,7 +95,7 @@ const EmailTemplates: React.FC = () => {
         {
           value: "settings.activateUrl",
           name: "{{ .Url }}",
-          example: "https://cloudreve.org/activate",
+          example: "https://github.com/dadastory/CloudRevo",
         },
       ],
     },
@@ -117,37 +115,28 @@ const EmailTemplates: React.FC = () => {
         {
           value: "settings.resetUrl",
           name: "{{ .Url }}",
-          example: "https://cloudreve.org/reset",
+          example: "https://github.com/dadastory/CloudRevo",
         },
       ],
     },
   ];
 
-  const handleProClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    setProOpen(true);
-  };
-
   return (
     <SettingSection>
-      <ProDialog open={proOpen} onClose={() => setProOpen(false)} />
       <Typography variant="h6" gutterBottom>
         {t("settings.emailTemplates")}
       </Typography>
       <SettingSectionContent>
         <Box>
-          {templateSettings.map((template) => (
+          {templateSettings.filter((template) => !template.pro).map((template) => (
             <StyledAccordion
               disableGutters
-              onClick={template.pro ? handleProClick : undefined}
               key={template.key}
-              expanded={template.pro ? false : undefined}
               TransitionProps={{ unmountOnExit: true }}
             >
               <AccordionSummary expandIcon={<ExpandMoreRounded />}>
                 <Typography>
                   {t("settings." + template.title)}
-                  {template.pro && <ProChip label="Pro" color="primary" size="small" />}
                 </Typography>
               </AccordionSummary>
               <AccordionDetails sx={{ display: "block" }}>

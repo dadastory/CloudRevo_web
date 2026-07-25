@@ -52,7 +52,7 @@
     "40012": "Índice de fragmento inválido. ({{message}})",
     "40013": "Longitud de contenido inválida. ({{message}})",
     "40014": "Se excedió el límite de lote para obtener enlaces de origen.",
-    "40015": "Se excedió el límite de lote de aria2.",
+    "40015": "Se excedió el límite de lote de descarga remota.",
     "40016": "Ruta no encontrada.",
     "40017": "Esta cuenta ha sido bloqueada.",
     "40018": "Esta cuenta no está activada.",

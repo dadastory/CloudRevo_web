@@ -11,6 +11,7 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  Tooltip,
   Typography,
 } from "@mui/material";
 import React, { useCallback, useEffect, useState } from "react";
@@ -20,10 +21,12 @@ import { FileResponse, Share } from "../../../../api/explorer.ts";
 import { closeManageShareDialog, setShareLinkDialog } from "../../../../redux/globalStateSlice.ts";
 import { useAppDispatch, useAppSelector } from "../../../../redux/hooks.ts";
 import { confirmOperation } from "../../../../redux/thunks/dialog.ts";
+import { copyToClipboard } from "../../../../util/index.ts";
 import AutoHeight from "../../../Common/AutoHeight.tsx";
 import { NoWrapTableCell, StyledTableContainerPaper } from "../../../Common/StyledComponents.tsx";
 import TimeBadge from "../../../Common/TimeBadge.tsx";
 import DraggableDialog from "../../../Dialogs/DraggableDialog.tsx";
+import CopyOutlined from "../../../Icons/CopyOutlined.tsx";
 import MoreVertical from "../../../Icons/MoreVertical.tsx";
 import { SquareMenuItem } from "../../ContextMenu/ContextMenu.tsx";
 import { ShareExpires, ShareStatistics } from "../../TopBar/ShareInfoPopover.tsx";
@@ -193,6 +196,19 @@ const ManageShares = () => {
                         hover
                       >
                         <NoWrapTableCell component="th" scope="row">
+                          <Tooltip title={t("share.copyLinkToClipboard")}>
+                            <IconButton
+                              aria-label={t("share.copyLinkToClipboard")}
+                              disabled={loading}
+                              onClick={(event) => {
+                                event.stopPropagation();
+                                copyToClipboard(e.url);
+                              }}
+                              size={"small"}
+                            >
+                              <CopyOutlined fontSize={"small"} />
+                            </IconButton>
+                          </Tooltip>
                           <IconButton disabled={loading} onClick={(event) => handleOpenAction(event, e)} size={"small"}>
                             <MoreVertical fontSize={"small"} />
                           </IconButton>

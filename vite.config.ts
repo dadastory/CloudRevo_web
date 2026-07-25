@@ -1,7 +1,7 @@
 import react from "@vitejs/plugin-react-swc";
 import { promises as fs } from "fs";
 import { resolve } from "path";
-import { defineConfig } from "vite";
+import { defineConfig } from "vitest/config";
 // import mkcert from "vite-plugin-mkcert";
 import { VitePWA } from "vite-plugin-pwa";
 import { viteStaticCopy } from "vite-plugin-static-copy";
@@ -55,7 +55,7 @@ export default defineConfig({
       },
     },
     // mkcert({
-    //   hosts: ["devv5.cloudreve.org"],
+    //   hosts: ["devv5.cloudrevo.local"],
     // }),
   ],
   define: {
@@ -98,6 +98,12 @@ export default defineConfig({
         },
       },
     },
+  },
+  test: {
+    environment: "jsdom",
+    include: ["tests/**/*.test.{ts,tsx}"],
+    clearMocks: true,
+    restoreMocks: true,
   },
   server: {
     host: "0.0.0.0",

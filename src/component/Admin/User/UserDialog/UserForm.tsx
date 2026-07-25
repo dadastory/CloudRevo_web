@@ -1,4 +1,3 @@
-import { OpenInNew } from "@mui/icons-material";
 import {
   Box,
   Collapse,
@@ -24,10 +23,9 @@ import { DenseFilledTextField, DenseSelect, SecondaryButton } from "../../../Com
 import UserAvatar from "../../../Common/User/UserAvatar";
 import { SquareMenuItem } from "../../../FileManager/ContextMenu/ContextMenu";
 import Delete from "../../../Icons/Delete";
-import SettingForm, { ProChip } from "../../../Pages/Setting/SettingForm";
+import SettingForm from "../../../Pages/Setting/SettingForm";
 import { CapacityBar } from "../../../Pages/Setting/StorageSetting";
 import GroupSelectionInput from "../../Common/GroupSelectionInput";
-import ProDialog from "../../Common/ProDialog";
 import { NoMarginHelperText } from "../../Settings/Settings";
 import { UserDialogContext } from "./UserDialog";
 
@@ -38,7 +36,6 @@ const UserForm = ({ reload, setLoading }: { reload: () => void; setLoading: (loa
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const { t } = useTranslation("dashboard");
   const { formRef, values, setUser } = useContext(UserDialogContext);
-  const [proOpen, setProOpen] = useState(false);
 
   const removeAvatar = useCallback(() => {
     setUser((prev) => ({ ...prev, avatar: undefined }));
@@ -109,7 +106,6 @@ const UserForm = ({ reload, setLoading }: { reload: () => void; setLoading: (loa
 
   return (
     <Box component={"form"} ref={formRef} onSubmit={(e) => e.preventDefault()}>
-      <ProDialog open={proOpen} onClose={() => setProOpen(false)} />
       <Stack spacing={isMobile ? 2 : 3} direction={isMobile ? "column" : "row"}>
         <Stack spacing={isMobile ? 2 : 3} direction={"column"} sx={{ minWidth: 200 }}>
           <SettingForm title={t("user.avatar")} noContainer lgWidth={12}>
@@ -147,16 +143,6 @@ const UserForm = ({ reload, setLoading }: { reload: () => void; setLoading: (loa
               </Link>
             </Typography>
           </SettingForm>
-          <Box>
-            <SecondaryButton
-              sx={{ mt: 1 }}
-              onClick={() => setProOpen(true)}
-              variant="contained"
-              startIcon={<OpenInNew />}
-            >
-              {t("user.openUserFiles")} <ProChip label="Pro" color="primary" size="small" />
-            </SecondaryButton>
-          </Box>
         </Stack>
         <Divider orientation="vertical" flexItem />
         <Box sx={{ flexGrow: 1 }}>

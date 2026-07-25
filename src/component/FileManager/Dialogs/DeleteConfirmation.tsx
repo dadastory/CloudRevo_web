@@ -72,6 +72,7 @@ const DeleteConfirmation = () => {
   const showAdvanceOptions = showUnlinkOption || showSkipSoftDeleteOption;
 
   const group = useMemo(() => SessionManager.currentUserGroup(), [open]);
+  const trashRetention = group?.trash_retention ?? 0;
 
   return (
     <DraggableDialog
@@ -112,9 +113,9 @@ const DeleteConfirmation = () => {
             <Collapse in={singleFileToTrash || multipleFilesToTrash}>
               <Alert sx={{ mt: 1 }} severity="info">
                 <Trans
-                  i18nKey="application:modals.trashRetention"
+                  i18nKey={trashRetention === 0 ? "modals.trashRetentionImmediate" : "modals.trashRetention"}
                   ns={"application"}
-                  values={{ num: formatDuration(dayjs.duration((group?.trash_retention ?? 0) * 1000)) }}
+                  values={trashRetention === 0 ? undefined : { num: formatDuration(dayjs.duration(trashRetention * 1000)) }}
                   components={[<strong key={0} />]}
                 />
               </Alert>

@@ -4,7 +4,15 @@ import Artplayer from "artplayer";
 import artplayerPluginChapter from "artplayer-plugin-chapter";
 import artplayerPluginHlsControl from "artplayer-plugin-hls-control";
 import { CrMaskedPrefix } from "./VideoViewer";
-import Hls, { HlsConfig } from "hls.js";
+import Hls, {
+  type FragmentLoaderContext,
+  type HlsConfig,
+  type Loader,
+  type LoaderCallbacks,
+  type LoaderConfiguration,
+  type LoaderContext,
+  type PlaylistLoaderContext,
+} from "hls.js";
 import mpegts from "mpegts.js";
 import i18next from "i18next";
 import { useEffect, useRef } from "react";
@@ -18,6 +26,40 @@ export interface PlayerProps extends BoxProps {
   getEntityUrl?: (url: string) => Promise<string>;
 }
 
+type LoaderConstructor<T extends LoaderContext> = new (config: HlsConfig) => Loader<T>;
+
+const isFragmentLoaderContext = (context: LoaderContext): context is FragmentLoaderContext => "frag" in context;
+
+const createUrlTransformLoader = <T extends LoaderContext>(
+  transform: (url: string, isPlaylist?: boolean) => Promise<string>,
+  isPlaylist: boolean,
+): LoaderConstructor<T> => {
+  const DefaultLoader = Hls.DefaultConfig.loader as unknown as LoaderConstructor<T>;
+
+  return class extends DefaultLoader {
+    load(context: T, config: LoaderConfiguration, callbacks: LoaderCallbacks<T>) {
+      void transform(context.url, isPlaylist).then((url) => {
+        context.url = url;
+        if (isFragmentLoaderContext(context)) {
+          context.frag.url = url;
+        }
+
+        const transformedCallbacks: LoaderCallbacks<T> = {
+          ...callbacks,
+          onSuccess: (response, stats, successContext, networkDetails) => {
+            response.url = url;
+            callbacks.onSuccess(response, stats, successContext, networkDetails);
+          },
+        };
+        super.load(context, config, transformedCallbacks);
+      });
+    }
+  };
+};
+
+const hasNumberHeight = (value: object): value is { height: number } => "height" in value && typeof value.height === "number";
+const hasStringName = (value: object): value is { name: string } => "name" in value && typeof value.name === "string";
+
 const playM3u8 =
   (
     urlTransform?: (url: string, isPlaylist?: boolean) => Promise<string>,
@@ -27,48 +69,12 @@ const playM3u8 =
     if (Hls.isSupported()) {
       if (art.hls) art.hls.destroy();
       const hls = new Hls({
-        fLoader: class extends Hls.DefaultConfig.loader {
-          constructor(config: HlsConfig) {
-            super(config);
-            var load = this.load.bind(this);
-            this.load = function (context, config, callbacks) {
-              if (urlTransform) {
-                urlTransform(context.url).then((url) => {
-                  const complete = callbacks.onSuccess;
-                  callbacks.onSuccess = (loaderResponse, stats, successContext, networkDetails) => {
-                    // Do something with loaderResponse.data
-                    loaderResponse.url = url;
-                    complete(loaderResponse, stats, successContext, networkDetails);
-                  };
-                  load({ ...context, frag: { ...context.frag, relurl: url, _url: url }, url }, config, callbacks);
-                });
-              } else {
-                load(context, config, callbacks);
-              }
-            };
-          }
-        },
-        pLoader: class extends Hls.DefaultConfig.loader {
-          constructor(config: HlsConfig) {
-            super(config);
-            var load = this.load.bind(this);
-            this.load = function (context, config, callbacks) {
-              if (urlTransform) {
-                urlTransform(context.url, true).then((url) => {
-                  const complete = callbacks.onSuccess;
-                  callbacks.onSuccess = (loaderResponse, stats, successContext, networkDetails) => {
-                    // Do something with loaderResponse.data
-                    loaderResponse.url = url;
-                    complete(loaderResponse, stats, successContext, networkDetails);
-                  };
-                  load({ ...context, url }, config, callbacks);
-                });
-              } else {
-                load(context, config, callbacks);
-              }
-            };
-          }
-        },
+        ...(urlTransform
+          ? {
+              fLoader: createUrlTransformLoader<FragmentLoaderContext>(urlTransform, false),
+              pLoader: createUrlTransformLoader<PlaylistLoaderContext>(urlTransform, true),
+            }
+          : {}),
         xhrSetup: async (xhr, url) => {
           // Always send cookies, even for cross-origin calls.
           if (url.startsWith(CrMaskedPrefix)) {
@@ -149,7 +155,8 @@ export default function Player({
             // Show qualitys in setting
             setting: true,
             // Get the quality name from level
-            getName: (level) => (level.height ? level.height + "P" : i18next.t("application:fileManager.default")),
+            getName: (level) =>
+              hasNumberHeight(level) ? level.height + "P" : i18next.t("application:fileManager.default"),
             // I18n
             title: i18next.t("application:fileManager.quality"),
             auto: i18next.t("application:fileManager.auto"),
@@ -160,7 +167,7 @@ export default function Player({
             // Show audios in setting
             setting: true,
             // Get the audio name from track
-            getName: (track) => track.name,
+            getName: (track) => (hasStringName(track) ? track.name : i18next.t("application:fileManager.default")),
             // I18n
             title: i18next.t("application:fileManager.audioTrack"),
             auto: i18next.t("application:fileManager.auto"),

@@ -52,7 +52,7 @@
     "40012": "Índice de parte inválido. ({{message}})",
     "40013": "Comprimento de conteúdo inválido. ({{message}})",
     "40014": "Excede limite de tamanho de lote para obter link de origem.",
-    "40015": "Excede limite de tamanho de lote do aria2.",
+    "40015": "Excede limite de tamanho de lote de download remoto.",
     "40016": "Caminho não encontrado.",
     "40017": "Esta conta foi bloqueada.",
     "40018": "Esta conta não está ativada.",

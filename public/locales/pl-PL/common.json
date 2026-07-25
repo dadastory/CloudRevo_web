@@ -52,7 +52,7 @@
     "40012": "Nieprawidłowy indeks fragmentu. ({{message}})",
     "40013": "Nieprawidłowa długość zawartości. ({{message}})",
     "40014": "Przekroczono limit rozmiaru partii pobierania linków źródłowych.",
-    "40015": "Przekroczono limit rozmiaru partii aria2.",
+    "40015": "Przekroczono limit rozmiaru partii zdalnego pobierania.",
     "40016": "Nie znaleziono ścieżki.",
     "40017": "To konto zostało zablokowane.",
     "40018": "To konto nie jest aktywowane.",

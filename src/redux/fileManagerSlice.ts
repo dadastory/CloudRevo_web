@@ -438,6 +438,7 @@ export const fileManagerSlice = createSlice({
             path: file.path,
             shared: file.shared,
             primary_entity: file.primary_entity,
+            access_rule: file.access_rule,
           };
 
           if (v.includeMetadata) {

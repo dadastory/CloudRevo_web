@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 180" role="img" aria-label="CloudRevo">
+  <defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#2563eb"/><stop offset="1" stop-color="#14b8a6"/></linearGradient></defs>
+  <rect width="180" height="180" rx="46" fill="url(#g)"/>
+  <path d="M127 57c-10-12-24-19-40-19-30 0-54 24-54 52s24 52 54 52c16 0 30-7 40-19" fill="none" stroke="#fff" stroke-width="17" stroke-linecap="round"/>
+  <path d="M89 56h25c18 0 31 13 31 30s-13 30-31 30H89" fill="none" stroke="#d1fae5" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="143" cy="40" r="10" fill="#fef08a"/>
+</svg>

@@ -29,7 +29,7 @@ import { getDashboardSummary } from "../../../api/api.ts";
 import { HomepageSummary } from "../../../api/dashboard.ts";
 import { useAppDispatch } from "../../../redux/hooks.ts";
 import FacebookCircularProgress from "../../Common/CircularProgress.tsx";
-import { SecondaryButton, SquareChip } from "../../Common/StyledComponents.tsx";
+import { SecondaryButton } from "../../Common/StyledComponents.tsx";
 import TimeBadge from "../../Common/TimeBadge.tsx";
 import Book from "../../Icons/Book.tsx";
 import BoxMultipleFilled from "../../Icons/BoxMultipleFilled.tsx";
@@ -39,11 +39,9 @@ import HomeIcon from "../../Icons/Home.tsx";
 import OpenFilled from "../../Icons/OpenFilled.tsx";
 import PeopleFilled from "../../Icons/PeopleFilled.tsx";
 import ShareFilled from "../../Icons/ShareFilled.tsx";
-import SparkleFilled from "../../Icons/SparkleFilled.tsx";
 import Telegram from "../../Icons/Telegram.tsx";
 import PageContainer from "../../Pages/PageContainer.tsx";
 import PageHeader from "../../Pages/PageHeader.tsx";
-import ProDialog from "../Common/ProDialog.tsx";
 import SiteUrlWarning from "./SiteUrlWarning.tsx";
 import CommentMultiple from "../../Icons/CommentMultiple.tsx";
 
@@ -64,7 +62,6 @@ const Home = () => {
   const [summary, setSummary] = useState<HomepageSummary | undefined>();
   const [chartLoading, setChartLoading] = useState(false);
   const [siteUrlWarning, setSiteUrlWarning] = useState(false);
-  const [proDialogOpen, setProDialogOpen] = useState(false);
   useEffect(() => {
     loadSummary(false);
   }, []);
@@ -90,7 +87,6 @@ const Home = () => {
 
   return (
     <PageContainer>
-      <ProDialog open={proDialogOpen} onClose={() => setProDialogOpen(false)} />
       <SiteUrlWarning
         open={siteUrlWarning}
         onClose={() => setSiteUrlWarning(false)}
@@ -309,14 +305,9 @@ const Home = () => {
           <Grid item xs={12} md={5} lg={4}>
             <StyledPaper sx={{ p: 0 }}>
               <Box sx={{ p: 3, display: "flex", alignItems: "center" }}>
-                <Box component={"img"} sx={{ width: 70 }} alt="cloudreve" src={"/static/img/cloudreve.svg"} />
+                <Box component={"img"} sx={{ width: 70 }} alt="CloudRevo" src={"/static/img/cloudrevo.svg"} />
                 <Box sx={{ ml: 2 }}>
-                  <Typography variant={"h5"} fontWeight={600}>
-                    Cloudreve
-                    {summary && summary.version.pro && (
-                      <SquareChip sx={{ ml: 1, height: "initial" }} size={"small"} color={"primary"} label={"Pro"} />
-                    )}
-                  </Typography>
+                  <Typography variant={"h5"} fontWeight={600}>CloudRevo</Typography>
                   <Typography variant={"subtitle2"} color={"text.secondary"}>
                     {summary ? summary.version.version : <Skeleton variant={"text"} width={70} />}
                     {summary && (
@@ -329,7 +320,7 @@ const Home = () => {
               </Box>
               <Divider />
               <List component="nav" aria-label="main mailbox folders" sx={{ mx: 2 }}>
-                <ListItemButton onClick={() => window.open("https://cloudreve.org")}>
+                <ListItemButton onClick={() => window.open("https://github.com/dadastory/CloudRevo")}>
                   <ListItemIcon>
                     <HomeIcon />
                   </ListItemIcon>
@@ -338,7 +329,7 @@ const Home = () => {
                     <OpenFilled />
                   </StyledListItemIcon>
                 </ListItemButton>
-                <ListItemButton onClick={() => window.open("https://github.com/cloudreve/cloudreve")}>
+                <ListItemButton onClick={() => window.open("https://github.com/dadastory/CloudRevo")}>
                   <ListItemIcon>
                     <GitHub />
                   </ListItemIcon>
@@ -347,7 +338,7 @@ const Home = () => {
                     <OpenFilled />
                   </StyledListItemIcon>
                 </ListItemButton>
-                <ListItemButton onClick={() => window.open("https://docs.cloudreve.org/")}>
+                <ListItemButton onClick={() => window.open("https://github.com/dadastory/CloudRevo")}>
                   <ListItemIcon>
                     <Book />
                   </ListItemIcon>
@@ -365,7 +356,7 @@ const Home = () => {
                     <OpenFilled />
                   </StyledListItemIcon>
                 </ListItemButton>
-                <ListItemButton onClick={() => window.open("https://t.me/cloudreve_official")}>
+                <ListItemButton onClick={() => window.open("https://github.com/dadastory/CloudRevo/discussions")}>
                   <ListItemIcon>
                     <Telegram />
                   </ListItemIcon>
@@ -374,7 +365,7 @@ const Home = () => {
                     <OpenFilled />
                   </StyledListItemIcon>
                 </ListItemButton>
-                <ListItemButton onClick={() => window.open("https://github.com/cloudreve/cloudreve/discussions")}>
+                <ListItemButton onClick={() => window.open("https://github.com/dadastory/CloudRevo")}>
                   <ListItemIcon>
                     <CommentMultiple />
                   </ListItemIcon>
@@ -383,14 +374,6 @@ const Home = () => {
                     <OpenFilled />
                   </StyledListItemIcon>
                 </ListItemButton>
-                {summary && !summary.version.pro && (
-                  <ListItemButton onClick={() => setProDialogOpen(true)}>
-                    <ListItemIcon>
-                      <SparkleFilled color={"primary"} />
-                    </ListItemIcon>
-                    <ListItemText primary={t("summary.buyPro")} />
-                  </ListItemButton>
-                )}
               </List>
               <Divider />
             </StyledPaper>
@@ -403,7 +386,7 @@ const Home = () => {
               <Divider sx={{ mb: 2, mt: 1 }} />
               <Giscus
                 id="comments"
-                repo="cloudreve/cloudreve"
+                repo="cloudrevo/cloudrevo"
                 repoId="MDEwOlJlcG9zaXRvcnkxMjAxNTYwNzY="
                 mapping={"number"}
                 term={i18next.language == "zh-CN" ? "2170" : "2169"}

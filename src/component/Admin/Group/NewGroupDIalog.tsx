@@ -22,7 +22,6 @@ const defaultGroupBs = new Boolset("");
 defaultGroupBs.sets({
   [GroupPermission.share]: true,
   [GroupPermission.share_download]: true,
-  [GroupPermission.set_anonymous_permission]: true,
 });
 const defaultGroup: GroupEnt = {
   name: "",
@@ -34,11 +33,11 @@ const defaultGroup: GroupEnt = {
     max_walked_files: 100000,
     trash_retention: 7 * 24 * 3600,
     source_batch: 10,
-    aria2_batch: 1,
+    remote_download_batch: 1,
     redirected_source: true,
   },
   edges: {
-    storage_policies: { id: 1 },
+    storage_policies: { id: 1 } as GroupEnt["edges"]["storage_policies"],
   },
   id: 0,
 };

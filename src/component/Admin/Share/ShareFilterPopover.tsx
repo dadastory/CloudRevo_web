@@ -9,6 +9,8 @@ export interface ShareFilterPopoverProps extends PopoverProps {
   setUser: (user: string) => void;
   file: string;
   setFile: (file: string) => void;
+  shareID: string;
+  setShareID: (shareID: string) => void;
   clearFilters: () => void;
 }
 
@@ -17,6 +19,8 @@ const ShareFilterPopover = ({
   setUser,
   file,
   setFile,
+  shareID,
+  setShareID,
   clearFilters,
   onClose,
   open,
@@ -27,12 +31,14 @@ const ShareFilterPopover = ({
   // Create local state to track changes before applying
   const [localUser, setLocalUser] = useState(user);
   const [localFile, setLocalFile] = useState(file);
+  const [localShareID, setLocalShareID] = useState(shareID);
 
   // Initialize local state when popup opens
   useEffect(() => {
     if (open) {
       setLocalUser(user);
       setLocalFile(file);
+      setLocalShareID(shareID);
     }
   }, [open]);
 
@@ -40,6 +46,7 @@ const ShareFilterPopover = ({
   const handleApplyFilters = () => {
     setUser(localUser);
     setFile(localFile);
+    setShareID(localShareID);
     onClose?.({}, "backdropClick");
   };
 
@@ -47,6 +54,7 @@ const ShareFilterPopover = ({
   const handleResetFilters = () => {
     setLocalUser("");
     setLocalFile("");
+    setLocalShareID("");
     clearFilters();
     onClose?.({}, "backdropClick");
   };
@@ -90,6 +98,15 @@ const ShareFilterPopover = ({
             fullWidth
             value={localFile}
             onChange={(e) => setLocalFile(e.target.value)}
+            placeholder={t("user.emptyNoFilter")}
+            size="small"
+          />
+        </SettingForm>
+        <SettingForm title={t("group.#")} noContainer lgWidth={12}>
+          <DenseFilledTextField
+            fullWidth
+            value={localShareID}
+            onChange={(e) => setLocalShareID(e.target.value.replace(/[^0-9,]/g, ""))}
             placeholder={t("user.emptyNoFilter")}
             size="small"
           />

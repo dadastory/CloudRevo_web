@@ -171,13 +171,13 @@ export const DenseAutocomplete = styled(Autocomplete)(({ theme }) => ({
   "& .MuiOutlinedInput-root .MuiAutocomplete-input": {
     padding: "5.5px 4px 5.5px 5px",
   },
-}));
+})) as typeof Autocomplete;
 
 export const NoWrapTableCell = styled(TableCell)({
   whiteSpace: "nowrap",
 });
 
-export const StyledCheckbox = styled(Checkbox)(({ theme }) => ({
+export const StyledCheckbox = styled(Checkbox)(() => ({
   width: 16,
   height: 16,
 }));
@@ -204,7 +204,7 @@ export const NoWrapBox = styled(Box)({
   overflow: "hidden",
 });
 
-export const DenseSelect = styled(Select)(({ theme }) => ({
+export const DenseSelect = styled(Select)(() => ({
   minHeight: "39px",
   "& .MuiOutlinedInput-input": {
     display: "flex",
@@ -265,7 +265,7 @@ export const StyledTab = styled(Tab)(({ theme }) => ({
   },
 }));
 
-export const StyledTabs = styled(Tabs)(({ theme }) => ({
+export const StyledTabs = styled(Tabs)(() => ({
   minHeight: 36,
   overflow: "initial",
   "& .MuiTabs-flexContainer": {
