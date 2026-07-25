@@ -14,8 +14,9 @@ describe("CloudRevo product identity", () => {
       expect(logo).toContain("secure collaborative workspace logo");
       expect(logo).toContain(">Cloud<tspan");
       expect(logo).toContain(">Revo</tspan>");
-      expect(logo).toContain("font-size=\"88\"");
-      expect(logo).toContain("x=\"208\" y=\"126\"");
+      expect(logo).toContain('viewBox="0 0 1320 192"');
+      expect(logo).toContain("font-size=\"220\"");
+      expect(logo).toContain("x=\"210\" y=\"168\"");
       expect(logo).toContain("M96 12 169 42v51");
       expect(logo).toContain("M59 64h40l13 14");
       expect(logo).toContain("M91 40h34l13 13");
