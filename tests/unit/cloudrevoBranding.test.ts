@@ -14,7 +14,8 @@ describe("CloudRevo product identity", () => {
       expect(logo).toContain("secure collaborative workspace logo");
       expect(logo).toContain(">Cloud<tspan");
       expect(logo).toContain(">Revo</tspan>");
-      expect(logo).toContain("font-size=\"72\"");
+      expect(logo).toContain("font-size=\"88\"");
+      expect(logo).toContain("x=\"208\" y=\"126\"");
       expect(logo).toContain("M96 12 169 42v51");
       expect(logo).toContain("M59 64h40l13 14");
       expect(logo).toContain("M91 40h34l13 13");
@@ -54,6 +55,21 @@ describe("CloudRevo product identity", () => {
   it("does not retain the unused inherited frame logo assets", () => {
     expect(existsSync(join(root, "src/component/Frame/assets/logo.svg"))).toBe(false);
     expect(existsSync(join(root, "src/component/Frame/assets/logo_light.svg"))).toBe(false);
+  });
+
+  it("does not ship unsupported desktop or mobile client connection flows", () => {
+    const devices = source("src/component/Pages/Devices/Devices.tsx");
+    const router = source("src/router/index.tsx");
+    const dialogs = source("src/component/FileManager/Dialogs/Dialogs.tsx");
+
+    expect(devices).not.toContain("AppPromotion");
+    expect(devices).not.toContain("DesktopAppPromotion");
+    expect(router).not.toContain("DesktopCallback");
+    expect(dialogs).not.toContain("DesktopMountSetup");
+    expect(existsSync(join(root, "src/component/Pages/Devices/AppPromotion.tsx"))).toBe(false);
+    expect(existsSync(join(root, "src/component/Pages/Devices/DesktopAppPromotion.tsx"))).toBe(false);
+    expect(existsSync(join(root, "src/component/Pages/Login/Signin/DesktopCallback.tsx"))).toBe(false);
+    expect(existsSync(join(root, "src/component/FileManager/Dialogs/DesktopMountSetup.tsx"))).toBe(false);
   });
 
   it("documents GPL derivative provenance and Gopeed acknowledgement", () => {

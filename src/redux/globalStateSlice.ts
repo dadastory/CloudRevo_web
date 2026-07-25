@@ -81,11 +81,6 @@ export interface DialogSelectOption {
   value: any;
 }
 
-export interface DesktopCallbackState {
-  code: string;
-  state: string;
-}
-
 export interface GlobalStateSlice {
   loading: {
     headlessFrame: boolean;
@@ -221,10 +216,6 @@ export interface GlobalStateSlice {
   directLinkManagementDialogFile?: FileResponse;
   directLinkHighlight?: string;
 
-  // Desktop mount setup dialog
-  desktopMountSetupDialogOpen?: boolean;
-  desktopMountSetupState?: DesktopCallbackState;
-
   // DnD
   dndState: DndState;
 
@@ -309,14 +300,6 @@ export const globalStateSlice = createSlice({
   name: "globalState",
   initialState,
   reducers: {
-    setDesktopMountSetupDialog: (state, action: PayloadAction<{ open: boolean; state?: DesktopCallbackState }>) => {
-      state.desktopMountSetupDialogOpen = action.payload.open;
-      state.desktopMountSetupState = action.payload.state;
-    },
-    closeDesktopMountSetupDialog: (state) => {
-      state.desktopMountSetupDialogOpen = false;
-      state.desktopMountSetupState = undefined;
-    },
     setUploadRawFiles: (
       state,
       action: PayloadAction<{
@@ -960,6 +943,4 @@ export const {
   setOAuthApp,
   setOAuthAppLoading,
   clearOAuthApp,
-  setDesktopMountSetupDialog,
-  closeDesktopMountSetupDialog,
 } = globalStateSlice.actions;

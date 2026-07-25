@@ -13,5 +13,5 @@
   <path d="M58 78h41l13 14h22c7 0 12 5 12 12v28c0 7-5 12-12 12H58c-7 0-12-5-12-12V90c0-7 5-12 12-12Z" fill="#0d55b7" opacity=".94"/>
   <path d="M59 92h40l13 14h21" fill="none" stroke="#79d7ff" stroke-linecap="round" stroke-linejoin="round" stroke-width="6"/>
   <path d="m77 122 10 9 22-24" fill="none" stroke="#dff7ff" stroke-linecap="round" stroke-linejoin="round" stroke-width="8"/>
-  <text x="216" y="119" fill="#10213f" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif" font-size="72" font-weight="700" letter-spacing="-3">Cloud<tspan fill="#1677e8">Revo</tspan></text>
+  <text x="208" y="126" fill="#10213f" font-family="ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, sans-serif" font-size="88" font-weight="700" letter-spacing="-4">Cloud<tspan fill="#1677e8">Revo</tspan></text>
 </svg>
