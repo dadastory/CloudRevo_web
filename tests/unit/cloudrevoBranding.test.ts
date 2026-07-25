@@ -6,13 +6,28 @@ const root = process.cwd();
 const source = (...path: string[]) => readFileSync(join(root, ...path), "utf8");
 
 describe("CloudRevo product identity", () => {
-  it("uses original CloudRevo metadata and artwork", () => {
-    for (const asset of ["logo.svg", "logo_light.svg", "cloudrevo.svg"]) {
+  it("uses an explicit CloudRevo wordmark and a secure collaborative-workspace mark", () => {
+    for (const asset of ["logo.svg", "logo_light.svg"]) {
       const logo = source("public/static/img", asset);
+
       expect(logo).toContain("CloudRevo");
-      expect(logo).toContain("folded cloud mark");
+      expect(logo).toContain("secure collaborative workspace logo");
+      expect(logo).toContain(">Cloud<tspan");
+      expect(logo).toContain(">Revo</tspan>");
+      expect(logo).toContain("font-size=\"72\"");
+      expect(logo).toContain("M96 12 169 42v51");
+      expect(logo).toContain("M59 64h40l13 14");
+      expect(logo).toContain("M91 40h34l13 13");
       expect(logo).not.toContain("Cloudreve");
     }
+
+    const compact = source("public/static/img", "cloudrevo.svg");
+    expect(compact).toContain("CloudRevo");
+    expect(compact).toContain("secure collaborative workspace mark");
+    expect(compact).toContain("M96 12 169 42v51");
+    expect(compact).toContain("M59 64h40l13 14");
+    expect(compact).toContain("m77 122 10 9 22-24");
+    expect(compact).not.toContain("font-size=");
   });
 
   it("keeps Powered by attribution within CloudRevo identity", () => {
