@@ -25,6 +25,7 @@ import { StyledCheckbox, StyledTableContainerPaper } from "../../Common/StyledCo
 import FileIcon from "../../FileManager/Explorer/FileIcon.tsx";
 import Dismiss from "../../Icons/Dismiss.tsx";
 import { getProgressColor } from "./TaskCard.tsx";
+import { fileProgressDetails } from "./downloadFileProgress.ts";
 
 export interface DownloadFileListProps {
   taskId: string;
@@ -83,10 +84,17 @@ const DownloadFileList = ({ taskId, summary, downloading, readonly }: DownloadFi
     )
       .then(() => {
         setChangeApplied(true);
+        setSelectedMask({});
+        window.dispatchEvent(new Event("cloudrevo:download-tasks-changed"));
         enqueueSnackbar({
           message: t("download.operationSubmitted"),
           variant: "success",
         });
+      })
+      .catch(() => {
+        // Keep the pending local selection visible so the user can correct or
+        // retry it after the server-side error snackbar is shown.
+        setChangeApplied(false);
       })
       .finally(() => {
         setLoading(false);
@@ -166,7 +174,7 @@ const DownloadFileList = ({ taskId, summary, downloading, readonly }: DownloadFi
                 // eslint-disable-next-line react/display-name
                 TableRow: (props) => {
                   const index = props["data-index"];
-                  const percentage = (files[index]?.progress ?? 0) * 100;
+                  const { known: progressKnown, percentage } = fileProgressDetails(files[index]);
                   const progressBgColor = theme.palette.background.default;
                   return (
                     <TableRow
@@ -221,7 +229,7 @@ const DownloadFileList = ({ taskId, summary, downloading, readonly }: DownloadFi
                   </TableCell>
                   <TableCell component="th" scope="row" sx={{ minWidth: 105 }}>
                     <Typography noWrap variant={"body2"}>
-                      {((value.progress ?? 0) * 100).toFixed(2)} %
+                      {fileProgressDetails(value).label}
                     </Typography>
                   </TableCell>
                 </>

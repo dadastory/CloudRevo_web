@@ -1,4 +1,4 @@
-import { readFileSync } from "node:fs";
+import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 
@@ -55,6 +55,34 @@ describe("Gopeed offline-download workbench", () => {
     expect(card).toContain("download.cancelTask");
     expect(card).toContain('transition: "width');
     expect(files).toContain('transition: "background-size');
+  });
+
+  it("reconnects task events and coalesces refreshes without overlapping requests", () => {
+    const list = source("component/Pages/Tasks/DownloadList.tsx");
+
+    expect(list).toContain("eventReconnectInitialDelay");
+    expect(list).toContain("scheduleReconnect(connect)");
+    expect(list).toContain("refreshInFlight.current");
+    expect(list).toContain("refreshPending.current");
+    expect(list).toContain("const loadNextPage");
+    expect(list).toContain("if (refreshInFlight.current)");
+    expect(list).toContain("const needsRefresh = refreshPending.current");
+    expect(list).toContain("eventController.current?.abort()");
+    expect(list).not.toContain("setInterval");
+  });
+
+  it("has no stale Aria2 administration text in supported locales", () => {
+    for (const locale of readdirSync(join(process.cwd(), "public", "locales"))) {
+      const content = readFileSync(join(process.cwd(), "public", "locales", locale, "dashboard.json"), "utf8");
+      expect(content).not.toMatch(/aria2|rpc-secret|:6800/i);
+      const dashboard = JSON.parse(content);
+      expect(dashboard.node.gopeedDes).toBeTruthy();
+      expect(dashboard.group.downloaderOptions).toBeTruthy();
+      if (locale !== "en-US" && locale !== "zh-CN") {
+        expect(dashboard.node.gopeedDes).not.toMatch(/^Connect CloudRevo to the Gopeed REST API/);
+        expect(dashboard.group.downloaderOptions).not.toBe("Downloader job options");
+      }
+    }
   });
 
   it("submits safe Gopeed connection tuning and preserves the preflight name for the queued row", () => {

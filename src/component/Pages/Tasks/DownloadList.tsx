@@ -15,6 +15,9 @@ import PageContainer from "../PageContainer.tsx";
 import SessionManager from "../../../session/index.ts";
 
 const defaultPageSize = 25;
+const eventReconnectInitialDelay = 1000;
+const eventReconnectMaxDelay = 30000;
+const eventStreamStableDuration = 5000;
 
 const DownloadList = () => {
   const { t } = useTranslation();
@@ -27,12 +30,76 @@ const DownloadList = () => {
   const [loading, setLoading] = useState(false);
   const [selectedTaskIDs, setSelectedTaskIDs] = useState<string[]>([]);
   const [actionLoading, setActionLoading] = useState(false);
-  const downloadingListHash = useRef("");
+  const mounted = useRef(false);
+  const refreshInFlight = useRef(false);
+  const refreshPending = useRef(false);
+  const eventController = useRef<AbortController>();
+  const eventReconnectTimer = useRef<ReturnType<typeof setTimeout>>();
+  const eventReconnectDelay = useRef(eventReconnectInitialDelay);
+
+  const reload = useCallback(async () => {
+    setLoading(true);
+    try {
+      const [downloading, downloaded] = await Promise.all([
+        dispatch(
+          getTasks({
+            page_size: defaultPageSize,
+            category: ListTaskCategory.downloading,
+          }),
+        ),
+        dispatch(
+          getTasks({
+            page_size: defaultPageSize,
+            category: ListTaskCategory.downloaded,
+            next_page_token: "",
+          }),
+        ),
+      ]);
+      if (!mounted.current) return;
+
+      setDownloadingTasks(downloading.tasks);
+      setTasks(downloaded.tasks);
+      setSelectedTaskIDs([]);
+      setNextPageToken(downloaded.pagination?.next_token);
+    } catch {
+      if (mounted.current) {
+        setNextPageToken(undefined);
+      }
+    } finally {
+      if (mounted.current) {
+        setLoading(false);
+      }
+    }
+  }, [dispatch]);
+
+  const refresh = useCallback(() => {
+    if (refreshInFlight.current) {
+      refreshPending.current = true;
+      return;
+    }
+    refreshInFlight.current = true;
+    void (async () => {
+      do {
+        refreshPending.current = false;
+        await reload();
+      } while (mounted.current && refreshPending.current);
+      refreshInFlight.current = false;
+    })();
+  }, [reload]);
 
   const loadNextPage = useCallback(
     (originTasks: TaskResponse[], token?: string) => () => {
+      // The event stream can request a full refresh while the observer asks for
+      // the next history page. Serialize both operations so a stale page can
+      // never overwrite a newer snapshot from the server.
+      if (refreshInFlight.current) {
+        refreshPending.current = true;
+        return;
+      }
+
+      refreshInFlight.current = true;
       setLoading(true);
-      dispatch(
+      void dispatch(
         getTasks({
           page_size: defaultPageSize,
           category: ListTaskCategory.downloaded,
@@ -40,80 +107,95 @@ const DownloadList = () => {
         }),
       )
         .then((res) => {
+          if (!mounted.current) return;
           setTasks([...originTasks, ...res.tasks]);
           setSelectedTaskIDs([]);
-          if (res.pagination?.next_token) {
-            setNextPageToken(res.pagination.next_token);
-          } else {
+          setNextPageToken(res.pagination?.next_token);
+        })
+        .catch(() => {
+          if (mounted.current) {
             setNextPageToken(undefined);
           }
         })
-        .catch(() => {
-          setNextPageToken(undefined);
-        })
         .finally(() => {
-          setLoading(false);
+          const needsRefresh = refreshPending.current;
+          refreshPending.current = false;
+          refreshInFlight.current = false;
+          if (mounted.current) {
+            setLoading(false);
+            if (needsRefresh) refresh();
+          }
         });
     },
-    [dispatch, setTasks],
+    [dispatch, refresh],
   );
 
   const loadDownloading = useCallback(() => {
-    setLoading(true);
-    dispatch(
-      getTasks({
-        page_size: defaultPageSize,
-        category: ListTaskCategory.downloading,
-      }),
-    )
-      .then((res) => {
-        setDownloadingTasks(res.tasks);
-        // New hash = id of first downloading task + id of last downloading task + length of downloading tasks
-        const newHash = `${res.tasks[0]?.id ?? ""}-${res.tasks[res.tasks.length - 1]?.id ?? ""}-${res.tasks.length}`;
-
-        if (downloadingListHash.current != "" && downloadingListHash.current != newHash) {
-          loadNextPage([], "")();
-        }
-        downloadingListHash.current = newHash;
-      })
-      .catch(() => {})
-      .finally(() => {
-        setLoading(false);
-      });
-  }, [dispatch, setDownloadingTasks]);
-
-  const refresh = useCallback(() => {
-    loadDownloading();
-    loadNextPage([], "")();
-  }, [loadDownloading, loadNextPage]);
+    refresh();
+  }, [refresh]);
 
   useEffect(() => {
+    mounted.current = true;
     refresh();
     const onTasksChanged = () => refresh();
     window.addEventListener("cloudrevo:download-tasks-changed", onTasksChanged);
-    const controller = new AbortController();
-    void (async () => {
-      const token = await SessionManager.getAccessToken();
-      const response = await fetch("/api/v4/workflow/events", {
-        headers: { Authorization: `Bearer ${token}` },
-        signal: controller.signal,
-      });
-      const reader = response.body?.getReader();
-      if (!reader) return;
-      const decoder = new TextDecoder();
-      let pending = "";
-      while (!controller.signal.aborted) {
-        const { value, done } = await reader.read();
-        if (done) return;
-        pending += decoder.decode(value, { stream: true });
-        const messages = pending.split("\n\n");
-        pending = messages.pop() ?? "";
-        if (messages.some((message) => message.includes("event: task"))) refresh();
-      }
-    })().catch(() => {});
+
+    const scheduleReconnect = (connect: () => void) => {
+      if (!mounted.current) return;
+      const delay = eventReconnectDelay.current;
+      eventReconnectDelay.current = Math.min(delay * 2, eventReconnectMaxDelay);
+      eventReconnectTimer.current = setTimeout(connect, delay);
+    };
+
+    const connect = () => {
+      if (!mounted.current) return;
+      eventController.current?.abort();
+      const controller = new AbortController();
+      eventController.current = controller;
+      const connectedAt = Date.now();
+      void (async () => {
+        try {
+          const token = await SessionManager.getAccessToken();
+          if (controller.signal.aborted) return;
+          const response = await fetch("/api/v4/workflow/events", {
+            headers: { Authorization: `Bearer ${token}` },
+            signal: controller.signal,
+          });
+          if (!response.ok || !response.body) {
+            throw new Error("workflow event stream unavailable");
+          }
+          const reader = response.body.getReader();
+          const decoder = new TextDecoder();
+          let pending = "";
+          while (!controller.signal.aborted) {
+            const { value, done } = await reader.read();
+            if (done) break;
+            pending += decoder.decode(value, { stream: true });
+            const messages = pending.split("\n\n");
+            pending = messages.pop() ?? "";
+            if (messages.some((message) => message.includes("event: task"))) refresh();
+          }
+        } catch {
+          // Reconnect below unless this page intentionally aborted the stream.
+        } finally {
+          if (!controller.signal.aborted && mounted.current) {
+            if (Date.now() - connectedAt >= eventStreamStableDuration) {
+              eventReconnectDelay.current = eventReconnectInitialDelay;
+            }
+            scheduleReconnect(connect);
+          }
+        }
+      })();
+    };
+
+    connect();
     return () => {
+      mounted.current = false;
       window.removeEventListener("cloudrevo:download-tasks-changed", onTasksChanged);
-      controller.abort();
+      eventController.current?.abort();
+      if (eventReconnectTimer.current) {
+        clearTimeout(eventReconnectTimer.current);
+      }
     };
   }, [refresh]);
 

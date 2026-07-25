@@ -30,6 +30,8 @@ import { ViewTaskAction } from "../../Common/Snackbar/snackbar.tsx";
 import DraggableDialog from "../../Dialogs/DraggableDialog.tsx";
 import Link from "../../Icons/Link.tsx";
 import { FileManagerIndex } from "../FileManager.tsx";
+import { classifyRemoteDownloadSource, supportsHTTPTaskControls } from "./remoteDownloadSource.ts";
+import { remoteDownloadPreflightErrorMessage } from "./remoteDownloadPreflight.ts";
 
 const CreateRemoteDownload = () => {
   const { t } = useTranslation();
@@ -52,6 +54,12 @@ const CreateRemoteDownload = () => {
   const open = useAppSelector((state) => state.globalState.remoteDownloadDialogOpen);
   const target = useAppSelector((state) => state.globalState.remoteDownloadDialogFile);
   const current = useAppSelector((state) => state.fileManager[FileManagerIndex.main].pure_path);
+  const sourceLines = url
+    .split("\n")
+    .map((source) => source.trim())
+    .filter(Boolean);
+  const sourceKind = sourceLines.length === 1 ? classifyRemoteDownloadSource(sourceLines[0]) : "unknown";
+  const showHTTPTaskControls = !target && sourceLines.length === 1 && supportsHTTPTaskControls(sourceLines[0]);
 
   useEffect(() => {
     if (open) {
@@ -74,6 +82,7 @@ const CreateRemoteDownload = () => {
   }, [dispatch]);
 
   const buildRequest = useCallback(() => {
+    if (!showHTTPTaskControls) return undefined;
     let request: RemoteDownloadRequestOptions | undefined;
     if (!target && (headers.trim() || body || method != "GET")) {
       let parsedHeaders: Record<string, string> | undefined;
@@ -97,9 +106,10 @@ const CreateRemoteDownload = () => {
       request = { method, headers: parsedHeaders, body: body || undefined };
     }
     return request;
-  }, [target, headers, body, method, enqueueSnackbar, t]);
+  }, [showHTTPTaskControls, target, headers, body, method, enqueueSnackbar, t]);
 
   const buildTaskOptions = useCallback((): RemoteDownloadTaskOptions | undefined | null => {
+    if (!showHTTPTaskControls) return undefined;
     if (!connections.trim()) {
       return undefined;
     }
@@ -109,24 +119,34 @@ const CreateRemoteDownload = () => {
       return null;
     }
     return { connections: value };
-  }, [connections, enqueueSnackbar, t]);
+  }, [showHTTPTaskControls, connections, enqueueSnackbar, t]);
 
   const onAccept = useCallback(() => {
     if (!target && !url) {
       return;
     }
     const request = buildRequest();
-    if (!target && (headers.trim() || body || method != "GET") && !request) return;
+    if (!target && showHTTPTaskControls && (headers.trim() || body || method != "GET") && !request) return;
     const gopeed = buildTaskOptions();
     if (gopeed === null) return;
 
-    const sources = url.split("\n").filter(Boolean);
-    if (!preview && !target && sources.length == 1) {
+    const sources = sourceLines;
+    if (!preview && !target && sources.length == 1 && sourceKind != "torrent-url") {
       setLoading(true);
-      dispatch(sendPreviewRemoteDownload({ src: sources, dst: path, request, gopeed }))
+      dispatch(sendPreviewRemoteDownload({ src: sources, dst: path, request, gopeed }, true))
         .then((result) => {
           setPreview(result);
           setSelectedFiles(result.files?.map((file) => file.index) ?? []);
+        })
+        .catch((error: unknown) => {
+          enqueueSnackbar({
+            message: remoteDownloadPreflightErrorMessage(
+              error,
+              t("modals.remoteDownloadMagnetTimeout"),
+              t("common:unknownError"),
+            ),
+            variant: "error",
+          });
         })
         .finally(() => setLoading(false));
       return;
@@ -163,6 +183,9 @@ const CreateRemoteDownload = () => {
     headers,
     body,
     method,
+    sourceKind,
+    sourceLines,
+    showHTTPTaskControls,
     preview,
     selectedFiles,
     buildRequest,
@@ -260,7 +283,12 @@ const CreateRemoteDownload = () => {
                   />
                 )}
               </Stack>
-              {!target && (
+              {!target && sourceKind == "torrent-url" && (
+                <Alert severity="info" variant="outlined">
+                  {t("modals.remoteDownloadTorrentInfo")}
+                </Alert>
+              )}
+              {!target && showHTTPTaskControls && (
                 <Accordion
                   expanded={advancedOpen}
                   onChange={(_event, expanded) => setAdvancedOpen(expanded)}

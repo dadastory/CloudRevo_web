@@ -925,13 +925,16 @@ export function sendCreateRemoteDownload(req: DownloadWorkflowService): ThunkRes
   };
 }
 
-export function sendPreviewRemoteDownload(req: DownloadWorkflowService): ThunkResponse<DownloadTaskStatus> {
+export function sendPreviewRemoteDownload(
+  req: DownloadWorkflowService,
+  skipErrorSnackbar = false,
+): ThunkResponse<DownloadTaskStatus> {
   return async (dispatch, _getState) => {
     return await dispatch(
       send(
         "/workflow/download/preview",
         { data: req, method: "POST" },
-        { ...defaultOpts },
+        { ...defaultOpts, bypassSnackbar: () => skipErrorSnackbar },
       ),
     );
   };

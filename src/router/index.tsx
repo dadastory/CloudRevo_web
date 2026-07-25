@@ -242,13 +242,6 @@ export const router = createBrowserRouter([
             },
           },
           {
-            path: "/connect",
-            async lazy() {
-              let { Devices } = await import("../component/Pages/Pages");
-              return { Component: Devices };
-            },
-          },
-          {
             path: "/settings",
             async lazy() {
               let { Setting } = await import("../component/Pages/Pages");

@@ -273,7 +273,7 @@ const TaskCard = ({
                   </span>
                 </Tooltip>
               )}
-              {!loading && task && onCancel && task.status === "queued" && (
+              {!loading && task && onCancel && ["queued", "processing", "suspending"].includes(task.status) && (
                 <Tooltip title={t("download.cancelTask")}>
                   <span>
                     <IconButton

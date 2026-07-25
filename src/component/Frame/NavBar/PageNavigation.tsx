@@ -25,8 +25,6 @@ import People from "../../Icons/People.tsx";
 import PeopleFilled from "../../Icons/PeopleFilled.tsx";
 import Person from "../../Icons/Person.tsx";
 import PersonOutlined from "../../Icons/PersonOutlined.tsx";
-import PhoneLaptop from "../../Icons/PhoneLaptop.tsx";
-import PhoneLaptopOutlined from "../../Icons/PhoneLaptopOutlined.tsx";
 import Server from "../../Icons/Server.tsx";
 import ServerFilled from "../../Icons/ServerFilled.tsx";
 import Setting from "../../Icons/Setting.tsx";
@@ -56,12 +54,6 @@ NavigationItems = [
     path: "/shares",
   },
 ];
-
-const ConnectNavigationItem: NavigationItem = {
-  label: "navbar.connect",
-  icon: [PhoneLaptop, PhoneLaptopOutlined],
-  path: "/connect",
-};
 
 const TaskNavigationItem: NavigationItem = {
   label: "navbar.taskQueue",
@@ -203,7 +195,6 @@ export const AdminPageNavigation = memo(() => {
 });
 
 const PageNavigation = () => {
-  const appPromotionEnabled = useAppSelector((state) => state.siteConfig.basic.config.app_promotion);
   const user = SessionManager.currentLoginOrNull();
   const isAdmin = useMemo(() => {
     return GroupBS(user?.user).enabled(GroupPermission.is_admin);
@@ -211,9 +202,6 @@ const PageNavigation = () => {
   const remoteDownloadEnabled = useMemo(() => {
     return GroupBS(user?.user).enabled(GroupPermission.remote_download);
   }, [user?.user?.group?.permission]);
-  const connectEnabled = useMemo(() => {
-    return GroupBS(user?.user).enabled(GroupPermission.webdav) || appPromotionEnabled;
-  }, [user?.user?.group?.permission, appPromotionEnabled]);
   const isLogin = !!user;
   const customNavItems = useAppSelector((state) => state.siteConfig.basic.config.custom_nav_items);
 
@@ -225,7 +213,6 @@ const PageNavigation = () => {
             {NavigationItems.map((item) => (
               <SideNavItemComponent key={item.label} item={item} />
             ))}
-            {connectEnabled && <SideNavItemComponent item={ConnectNavigationItem} />}
             <SideNavItemComponent item={TaskNavigationItem} />
             {remoteDownloadEnabled && <SideNavItemComponent item={RemoteDownloadNavigationItem} />}
           </>

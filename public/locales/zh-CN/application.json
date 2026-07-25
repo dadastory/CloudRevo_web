@@ -546,6 +546,8 @@
     "remoteDownloadPreview": "预检查",
     "remoteDownloadStart": "开始下载",
     "remoteDownloadPreviewReady": "预检查完成。请选择要下载的文件，确认后才会创建任务。",
+    "remoteDownloadMagnetTimeout": "磁力元数据解析超时，请重试。",
+    "remoteDownloadTorrentInfo": "Gopeed 会在创建后解析 BitTorrent 元数据。任务启动后可在活动任务中选择文件。",
     "remoteDownloadPreviewSize": "解析大小：{{size}}",
     "remoteDownloadAuthorizedHeaders": "仅填写你有权使用的请求头（例如 Referer、Cookie 或 User-Agent）。系统不会自动获取浏览器凭据，也不会在任务列表中显示这些内容。",
     "remoteDownloadMethod": "请求方法",

@@ -25,4 +25,20 @@ describe("default optional-feature availability", () => {
     expect(providerSelector).toContain("filter((type) => !PolicyPropsMap[type].pro)");
     expect(customProperties).toContain("filter((type) => !FieldTypes[type].pro)");
   });
+
+  it("does not ship unfinished Connect, announcement, or Giscus UI", () => {
+    const navigation = source("component/Frame/NavBar/PageNavigation.tsx");
+    const router = readFileSync(join(process.cwd(), "src/router/index.tsx"), "utf8");
+    const siteInformation = source("component/Admin/Settings/SiteInformation/SiteInformation.tsx");
+    const dashboard = source("component/Admin/Home/Home.tsx");
+
+    expect(navigation).not.toContain('path: "/connect"');
+    expect(router).not.toContain('path: "/connect"');
+    expect(siteInformation).not.toContain("settings.announcement");
+    expect(siteInformation).not.toContain("show_app_promotion");
+    expect(siteInformation).not.toContain("show_desktop_app_promotion");
+    expect(dashboard).not.toContain("@giscus/react");
+    expect(dashboard).not.toContain("<Giscus");
+    expect(readFileSync(join(process.cwd(), "package.json"), "utf8")).not.toContain("@giscus/react");
+  });
 });

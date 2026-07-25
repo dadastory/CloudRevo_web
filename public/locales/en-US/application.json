@@ -546,6 +546,8 @@
     "remoteDownloadPreview": "Preflight",
     "remoteDownloadStart": "Start download",
     "remoteDownloadPreviewReady": "Preflight complete. Select files, then confirm to create the task.",
+    "remoteDownloadMagnetTimeout": "Magnet metadata resolution timed out. Please retry.",
+    "remoteDownloadTorrentInfo": "BitTorrent metadata will be resolved by Gopeed after creation. You can select its files from the active task.",
     "remoteDownloadPreviewSize": "Resolved size: {{size}}",
     "remoteDownloadAuthorizedHeaders": "Enter only headers you are authorized to use, such as Referer, Cookie, or User-Agent. The app never collects browser credentials and does not show these values in task lists.",
     "remoteDownloadMethod": "Request method",

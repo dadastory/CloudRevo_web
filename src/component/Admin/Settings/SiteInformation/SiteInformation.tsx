@@ -1,8 +1,7 @@
-import { Box, FormControl, FormControlLabel, Stack, Switch, Typography } from "@mui/material";
+import { Box, FormControl, Stack, Typography } from "@mui/material";
 import Grid from "@mui/material/Grid";
 import { useContext } from "react";
 import { useTranslation } from "react-i18next";
-import { isTrueVal } from "../../../../session/utils.ts";
 import { DenseFilledTextField } from "../../../Common/StyledComponents.tsx";
 import SettingForm from "../../../Pages/Setting/SettingForm.tsx";
 import { NoMarginHelperText, SettingSection, SettingSectionContent, StyledInputAdornment } from "../Settings.tsx";
@@ -62,12 +61,6 @@ const SiteInformation = () => {
                   rows={4}
                 />
                 <NoMarginHelperText>{t("settings.customFooterHTMLDes")}</NoMarginHelperText>
-              </FormControl>
-            </SettingForm>
-            <SettingForm title={t("settings.announcement")} lgWidth={5} pro>
-              <FormControl fullWidth>
-                <DenseFilledTextField inputProps={{ readOnly: true }} fullWidth multiline rows={4} />
-                <NoMarginHelperText>{t("settings.announcementDes")}</NoMarginHelperText>
               </FormControl>
             </SettingForm>
             <SettingForm title={t("settings.tosUrl")} lgWidth={5}>
@@ -202,75 +195,6 @@ const SiteInformation = () => {
                   required
                 />
                 <NoMarginHelperText>{t("settings.largeIconDes")}</NoMarginHelperText>
-              </FormControl>
-            </SettingForm>
-          </SettingSectionContent>
-        </SettingSection>
-        <SettingSection>
-          <Typography variant="h6" gutterBottom>
-            {t("vas.mobileApp")}
-          </Typography>
-          <SettingSectionContent>
-            <SettingForm lgWidth={5}>
-              <FormControl fullWidth>
-                <FormControlLabel
-                  control={
-                    <Switch
-                      checked={isTrueVal(values.show_app_promotion)}
-                      onChange={(e) =>
-                        setSettings({
-                          show_app_promotion: e.target.checked ? "1" : "0",
-                        })
-                      }
-                    />
-                  }
-                  label={t("vas.showAppPromotion")}
-                />
-                <NoMarginHelperText>{t("vas.showAppPromotionDes")}</NoMarginHelperText>
-              </FormControl>
-            </SettingForm>
-            <SettingForm title={t("vas.appFeedback")} lgWidth={5} pro>
-              <FormControl fullWidth>
-                <DenseFilledTextField
-                  fullWidth
-                  slotProps={{
-                    input: {
-                      readOnly: true,
-                    },
-                  }}
-                />
-                <NoMarginHelperText>{t("vas.appLinkDes")}</NoMarginHelperText>
-              </FormControl>
-            </SettingForm>
-            <SettingForm title={t("vas.appForum")} lgWidth={5} pro>
-              <FormControl fullWidth>
-                <DenseFilledTextField fullWidth slotProps={{ input: { readOnly: true } }} />
-                <NoMarginHelperText>{t("vas.appLinkDes")}</NoMarginHelperText>
-              </FormControl>
-            </SettingForm>
-          </SettingSectionContent>
-        </SettingSection>
-        <SettingSection>
-          <Typography variant="h6" gutterBottom>
-            {t("vas.desktopApp")}
-          </Typography>
-          <SettingSectionContent>
-            <SettingForm lgWidth={5}>
-              <FormControl fullWidth>
-                <FormControlLabel
-                  control={
-                    <Switch
-                      checked={isTrueVal(values.show_desktop_app_promotion)}
-                      onChange={(e) =>
-                        setSettings({
-                          show_desktop_app_promotion: e.target.checked ? "1" : "0",
-                        })
-                      }
-                    />
-                  }
-                  label={t("vas.showDesktopAppPromotion")}
-                />
-                <NoMarginHelperText>{t("vas.showDesktopAppPromotionDes")}</NoMarginHelperText>
               </FormControl>
             </SettingForm>
           </SettingSectionContent>

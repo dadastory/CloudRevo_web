@@ -1,4 +1,3 @@
-import Giscus from "@giscus/react";
 import { GitHub } from "@mui/icons-material";
 import {
   Avatar,
@@ -18,9 +17,7 @@ import {
 } from "@mui/material";
 import { blue, green, red, yellow } from "@mui/material/colors";
 import Grid from "@mui/material/Grid";
-import { useTheme } from "@mui/material/styles";
 import dayjs from "dayjs";
-import i18next from "i18next";
 import { useCallback, useEffect, useState } from "react";
 import { Trans, useTranslation } from "react-i18next";
 import { CSSTransition, SwitchTransition } from "react-transition-group";
@@ -57,7 +54,6 @@ const StyledListItemIcon = styled(ListItemIcon)(() => ({
 
 const Home = () => {
   const { t } = useTranslation("dashboard");
-  const theme = useTheme();
   const dispatch = useAppDispatch();
   const [summary, setSummary] = useState<HomepageSummary | undefined>();
   const [chartLoading, setChartLoading] = useState(false);
@@ -376,27 +372,6 @@ const Home = () => {
                 </ListItemButton>
               </List>
               <Divider />
-            </StyledPaper>
-          </Grid>
-          <Grid item xs={12} md={7} lg={8}>
-            <StyledPaper>
-              <Typography variant={"subtitle1"} fontWeight={500}>
-                公告
-              </Typography>
-              <Divider sx={{ mb: 2, mt: 1 }} />
-              <Giscus
-                id="comments"
-                repo="cloudrevo/cloudrevo"
-                repoId="MDEwOlJlcG9zaXRvcnkxMjAxNTYwNzY="
-                mapping={"number"}
-                term={i18next.language == "zh-CN" ? "2170" : "2169"}
-                reactionsEnabled={"1"}
-                emitMetadata={"0"}
-                inputPosition={"bottom"}
-                theme={theme.palette.mode === "dark" ? "dark" : "light"}
-                lang={i18next.language == "zh-CN" ? "zh-CN" : "en"}
-                loading={"lazy"}
-              />
             </StyledPaper>
           </Grid>
         </Grid>

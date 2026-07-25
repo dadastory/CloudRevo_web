@@ -69,6 +69,7 @@ export interface DownloadTaskFile {
   name: string;
   size: number;
   progress: number;
+  progress_known?: boolean;
   selected: boolean;
 }
 
