@@ -45,9 +45,10 @@ describe("CloudRevo product identity", () => {
     const dark = source("..", "docs/brand/logo_light.svg");
 
     for (const readme of [source("..", "README.md"), source("..", "README_zh-CN.md")]) {
-      expect(readme).toContain("raw.githubusercontent.com/dadastory/CloudRevo/main/docs/brand/logo.svg");
-      expect(readme).toContain("raw.githubusercontent.com/dadastory/CloudRevo/main/docs/brand/logo_light.svg");
-      expect(readme).not.toContain("CloudRevo_web/main/public/static/img/logo");
+      expect(readme).toContain('srcset="docs/brand/logo.svg"');
+      expect(readme).toContain('srcset="docs/brand/logo_light.svg"');
+      expect(readme).toContain('src="docs/brand/logo.svg"');
+      expect(readme).not.toContain('<a href="https://github.com/dadastory/CloudRevo_web">');
     }
     expect(light).toBe(source("public/static/img", "logo.svg"));
     expect(dark).toBe(source("public/static/img", "logo_light.svg"));
