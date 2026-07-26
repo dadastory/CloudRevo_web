@@ -34,7 +34,10 @@ describe("Gopeed sidecar build sources", () => {
     expect(workflow).toContain("verify-gopeed:");
     expect(workflow).toContain("gopeed-fork-test");
     expect(workflow).toContain("gopeed-contract");
-    expect(workflow).toContain("GOPEED_VERSION=v1.9.3");
+    expect(workflow).toContain("build_arg: VERSION");
+    expect(workflow).toContain("build_arg: GOPEED_VERSION");
+    expect(workflow).toContain("${{ matrix.build_arg }}=${{ matrix.build_arg == 'VERSION' && env.RELEASE_VERSION || 'v1.9.3' }}");
+    expect(workflow).not.toContain("build_args: VERSION=${{ env.RELEASE_VERSION }}");
   });
 
   it("provides a fresh, alias-aware Compose command for the private Gopeed contract", () => {
