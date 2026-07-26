@@ -34,6 +34,7 @@ describe("Gopeed sidecar build sources", () => {
     expect(workflow).toContain("verify-gopeed:");
     expect(workflow).toContain("gopeed-fork-test");
     expect(workflow).toContain("gopeed-contract");
+    expect(workflow).toMatch(/verify-gopeed:[\s\S]*?POSTGRES_PASSWORD:\s*cloudrevo-ci-postgres-password/);
     expect(workflow).toContain("build_arg: VERSION");
     expect(workflow).toContain("build_arg: GOPEED_VERSION");
     expect(workflow).toContain("${{ matrix.build_arg }}=${{ matrix.build_arg == 'VERSION' && env.RELEASE_VERSION || 'v1.9.3' }}");
