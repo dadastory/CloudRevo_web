@@ -174,7 +174,7 @@ const DownloadFileList = ({ taskId, summary, downloading, readonly }: DownloadFi
                 // eslint-disable-next-line react/display-name
                 TableRow: (props) => {
                   const index = props["data-index"];
-                  const { known: progressKnown, percentage } = fileProgressDetails(files[index]);
+                  const { known: progressKnown, percentage } = fileProgressDetails(filteredFiles[index]);
                   const progressBgColor = theme.palette.background.default;
                   return (
                     <TableRow

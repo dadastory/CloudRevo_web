@@ -1,9 +1,16 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { ListTaskCategory, TaskResponse, TaskStatus } from "../../../api/workflow.ts";
+import { DownloadTaskState, ListTaskCategory, TaskResponse, TaskStatus, TaskType } from "../../../api/workflow.ts";
 import { Box, Button, Container, Stack, Typography } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import PageHeader from "../PageHeader.tsx";
-import { getTasks, sendCancelDownloadTask, sendDeleteDownloadTasks, sendRetryDownloadTasks } from "../../../api/api.ts";
+import {
+  getTasks,
+  sendCancelDownloadTask,
+  sendContinueDownloadTask,
+  sendDeleteDownloadTasks,
+  sendPauseDownloadTask,
+  sendRetryDownloadTasks,
+} from "../../../api/api.ts";
 import { useAppDispatch } from "../../../redux/hooks.ts";
 import { confirmOperation } from "../../../redux/thunks/dialog.ts";
 import Nothing from "../../Common/Nothing.tsx";
@@ -258,6 +265,16 @@ const DownloadList = () => {
     });
   };
 
+  const controlTask = (id: string, resume: boolean) => {
+    setActionLoading(true);
+    dispatch(resume ? sendContinueDownloadTask(id) : sendPauseDownloadTask(id))
+      .then(() => {
+        enqueueSnackbar({ message: t(resume ? "download.taskContinued" : "download.taskPaused"), variant: "success" });
+        refresh();
+      })
+      .finally(() => setActionLoading(false));
+  };
+
   return (
     <PageContainer>
       <Container maxWidth="lg">
@@ -301,15 +318,21 @@ const DownloadList = () => {
         )}
         {downloadingTasks == undefined && <TaskCard onLoad={loadDownloading} loading={true} />}
 
-        {downloadingTasks && downloadingTasks.map((task) => (
-          <TaskCard
-            showProgress
-            key={task.id}
-            task={task}
-            onCancel={task.status == TaskStatus.queued ? (queuedTask) => cancelTask(queuedTask.id) : undefined}
-            actionLoading={actionLoading}
-          />
-        ))}
+        {downloadingTasks && downloadingTasks.map((task) => {
+          const canControl = task.type == TaskType.remote_download && [TaskStatus.processing, TaskStatus.suspending].includes(task.status);
+          const paused = task.summary?.props.download?.state == DownloadTaskState.paused;
+          return (
+            <TaskCard
+              showProgress
+              key={task.id}
+              task={task}
+              onCancel={task.status == TaskStatus.queued ? (queuedTask) => cancelTask(queuedTask.id) : undefined}
+              onPause={canControl && !paused ? (activeTask) => controlTask(activeTask.id, false) : undefined}
+              onContinue={canControl && paused ? (activeTask) => controlTask(activeTask.id, true) : undefined}
+              actionLoading={actionLoading}
+            />
+          );
+        })}
         <Typography variant={"h5"} sx={{ mb: 2, mt: 3 }} color={"text.secondary"} fontWeight={500}>
           {t("download.finished")}
         </Typography>

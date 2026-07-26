@@ -973,6 +973,30 @@ export function sendCancelDownloadTask(id: string): ThunkResponse {
   };
 }
 
+export function sendPauseDownloadTask(id: string): ThunkResponse {
+  return async (dispatch, _getState) => {
+    return await dispatch(
+      send(
+        "/workflow/download/" + id + "/pause",
+        { method: "PUT" },
+        { ...defaultOpts },
+      ),
+    );
+  };
+}
+
+export function sendContinueDownloadTask(id: string): ThunkResponse {
+  return async (dispatch, _getState) => {
+    return await dispatch(
+      send(
+        "/workflow/download/" + id + "/continue",
+        { method: "PUT" },
+        { ...defaultOpts },
+      ),
+    );
+  };
+}
+
 export function sendRetryDownloadTask(id: string): ThunkResponse<TaskResponse> {
   return async (dispatch, _getState) => {
     return await dispatch(

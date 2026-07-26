@@ -16,3 +16,8 @@ export const classifyRemoteDownloadSource = (source: string): RemoteDownloadSour
 };
 
 export const supportsHTTPTaskControls = (source: string) => classifyRemoteDownloadSource(source) === "http";
+
+export const requiresRemoteDownloadPreflight = (source: string) => {
+  const kind = classifyRemoteDownloadSource(source);
+  return kind !== "torrent-url" && kind !== "ed2k";
+};

@@ -1219,6 +1219,8 @@
     "refresh": "刷新"
   },
   "group": {
+    "gopeedDefaultConnections": "默认 HTTP 连接数",
+    "gopeedDefaultConnectionsDes": "可选，1–256。任务未指定连接数时使用此安全默认值。",
     "countUser": "统计",
     "anonymous": "未登录访客用户组",
     "sysGroup": "系统用户组",
@@ -1256,6 +1258,8 @@
     "allowRemoteDownload": "离线下载",
     "allowRemoteDownloadDes": "是否允许用户创建离线下载任务。如需使用离线下载，还需要在 <0>节点列表</0> 中有开启离线下载功能的节点。",
     "downloaderOptions": "下载器任务参数",
+    "gopeedDefaultConnections": "默认 HTTP 连接数",
+    "gopeedDefaultConnectionsDes": "可选，1–256。任务和用户组未指定连接数时使用此安全默认值。",
     "downloaderOptionsDes": "所选下载器的任务额外配置参数，以 JSON 键值对格式书写，可用参数请查阅其官方文档。",
     "remoteDownloadBatchSize": "批量离线下载最大数量",
     "remoteDownloadBatchSizeDes": "批量创建离线下载时的最大数量，填写为 0 表示不限制。",

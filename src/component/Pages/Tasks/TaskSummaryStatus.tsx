@@ -1,7 +1,7 @@
 import { Box, styled, Tooltip, Typography, useTheme } from "@mui/material";
 import { forwardRef } from "react";
 import { useTranslation } from "react-i18next";
-import { TaskStatus, TaskSummary, TaskType } from "../../../api/workflow.ts";
+import { DownloadTaskState, TaskStatus, TaskSummary, TaskType } from "../../../api/workflow.ts";
 import { useAppDispatch } from "../../../redux/hooks.ts";
 import { sizeToString } from "../../../util";
 import ArrowSyncCircleFilled from "../../Icons/ArrowSyncCircleFilled.tsx";
@@ -75,6 +75,15 @@ const TaskSummaryStatus = ({ type, status, summary, error, simplified }: TaskSum
       if (type == TaskType.remote_download) {
         if (summary?.phase == "monitor" && summary?.props.download) {
           const downloadStatus = summary.props.download;
+          if (downloadStatus.state === DownloadTaskState.waiting) {
+            return (
+              <TaskStatusContent
+                title={t("download.waiting")}
+                icon={<CircleHintFilled fontSize={"small"} />}
+                color={theme.palette.action.active}
+              />
+            );
+          }
           return (
             <Box
               sx={{

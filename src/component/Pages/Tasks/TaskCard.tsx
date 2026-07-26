@@ -29,6 +29,8 @@ import ArrowImport from "../../Icons/ArrowImport.tsx";
 import Dismiss from "../../Icons/Dismiss.tsx";
 import Delete from "../../Icons/Delete.tsx";
 import ArrowSync from "../../Icons/ArrowSync.tsx";
+import Pause from "../../Icons/Pause.tsx";
+import Play from "../../Icons/Play.tsx";
 import TaskDetail from "./TaskDetail.tsx";
 import TaskSummaryStatus from "./TaskSummaryStatus.tsx";
 import TaskSummaryTitle from "./TaskSummaryTitle.tsx";
@@ -115,6 +117,8 @@ export interface TaskCardProps {
   onRetry?: (task: TaskResponse) => void;
   onDelete?: (task: TaskResponse) => void;
   onCancel?: (task: TaskResponse) => void;
+  onPause?: (task: TaskResponse) => void;
+  onContinue?: (task: TaskResponse) => void;
   actionLoading?: boolean;
 }
 
@@ -136,6 +140,8 @@ const TaskCard = ({
   onRetry,
   onDelete,
   onCancel,
+  onPause,
+  onContinue,
   actionLoading,
 }: TaskCardProps) => {
   const { t } = useTranslation();
@@ -286,6 +292,38 @@ const TaskCard = ({
                       }}
                     >
                       <Dismiss fontSize="small" />
+                    </IconButton>
+                  </span>
+                </Tooltip>
+              )}
+              {!loading && task && onPause && (
+                <Tooltip title={t("download.pauseTask")}>
+                  <span>
+                    <IconButton
+                      size="small"
+                      disabled={actionLoading}
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        onPause(task);
+                      }}
+                    >
+                      <Pause fontSize="small" />
+                    </IconButton>
+                  </span>
+                </Tooltip>
+              )}
+              {!loading && task && onContinue && (
+                <Tooltip title={t("download.continueTask")}>
+                  <span>
+                    <IconButton
+                      size="small"
+                      disabled={actionLoading}
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        onContinue(task);
+                      }}
+                    >
+                      <Play fontSize="small" />
                     </IconButton>
                   </span>
                 </Tooltip>

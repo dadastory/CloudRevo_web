@@ -1,5 +1,4 @@
 import {
-  CircularProgress,
   Collapse,
   FormControl,
   FormControlLabel,
@@ -7,9 +6,8 @@ import {
   Stack,
   Switch,
   Typography,
-  useTheme,
 } from "@mui/material";
-import { lazy, Suspense, useCallback, useContext, useEffect, useMemo, useState } from "react";
+import { useCallback, useContext, useMemo } from "react";
 import { Trans, useTranslation } from "react-i18next";
 import { Link as RouterLink } from "react-router-dom";
 import { GroupEnt } from "../../../../api/dashboard";
@@ -23,24 +21,12 @@ import { AnonymousGroupID } from "../GroupRow";
 import { GroupSettingContext } from "./GroupSettingWrapper";
 import MultipleNodeSelectionInput from "./MultipleNodeSelectionInput";
 
-const MonacoEditor = lazy(() => import("../../../Viewers/CodeViewer/MonacoEditor"));
-
 const FileManagementSection = () => {
   const { t } = useTranslation("dashboard");
   const { values, setGroup } = useContext(GroupSettingContext);
-  const theme = useTheme();
-
-  const [editedConfig, setEditedConfig] = useState("");
-
   const permission = useMemo(() => {
     return new Boolset(values.permissions ?? "");
   }, [values.permissions]);
-
-  useEffect(() => {
-    setEditedConfig(
-      values.settings?.remote_download_options ? JSON.stringify(values.settings?.remote_download_options, null, 2) : "",
-    );
-  }, [values.settings?.remote_download_options]);
 
   const onAllowWabDAVChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -96,20 +82,14 @@ const FileManagementSection = () => {
     [setGroup],
   );
 
-  const onEditedConfigBlur = useCallback(
-    (value: string) => {
-      var res: Record<string, any> | undefined = undefined;
-      if (value) {
-        try {
-          res = JSON.parse(value);
-        } catch (e) {
-          console.error(e);
-        }
-      }
-      setGroup((p: GroupEnt) => ({ ...p, settings: { ...p.settings, remote_download_options: res } }));
-    },
-    [editedConfig, setGroup],
-  );
+  const onRemoteDownloadConnectionsChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const connections = Number(e.target.value);
+    const valid = Number.isInteger(connections) && connections >= 1 && connections <= 256;
+    setGroup((p: GroupEnt) => ({
+      ...p,
+      settings: { ...p.settings, remote_download_options: valid ? { connections } : undefined },
+    }));
+  }, [setGroup]);
 
   const onRemoteDownloadBatchSizeChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -251,25 +231,14 @@ const FileManagementSection = () => {
             </SettingForm>
             <Collapse in={permission.enabled(GroupPermission.remote_download)} unmountOnExit>
               <Stack spacing={3}>
-                <SettingForm title={t("group.downloaderOptions")} lgWidth={5}>
+                <SettingForm title={t("group.gopeedDefaultConnections")} lgWidth={5}>
                   <FormControl fullWidth>
-                    <Suspense fallback={<CircularProgress />}>
-                      <MonacoEditor
-                        theme={theme.palette.mode === "dark" ? "vs-dark" : "vs"}
-                        language="json"
-                        value={editedConfig}
-                        onChange={(value) => setEditedConfig(value || "")}
-                        onBlur={onEditedConfigBlur}
-                        height="200px"
-                        minHeight="200px"
-                        options={{
-                          wordWrap: "on",
-                          minimap: { enabled: false },
-                          scrollBeyondLastLine: false,
-                        }}
-                      />
-                    </Suspense>
-                    <NoMarginHelperText>{t("group.downloaderOptionsDes")}</NoMarginHelperText>
+                    <DenseFilledTextField
+                      slotProps={{ htmlInput: { type: "number", min: 1, max: 256 } }}
+                      value={values.settings?.remote_download_options?.connections ?? ""}
+                      onChange={onRemoteDownloadConnectionsChange}
+                    />
+                    <NoMarginHelperText>{t("group.gopeedDefaultConnectionsDes")}</NoMarginHelperText>
                   </FormControl>
                 </SettingForm>
                 <SettingForm title={t("group.remoteDownloadBatchSize")} lgWidth={5}>

@@ -1219,6 +1219,8 @@
     "refresh": "Refresh"
   },
   "group": {
+    "gopeedDefaultConnections": "Default HTTP connections",
+    "gopeedDefaultConnectionsDes": "Optional, 1–256. This safe default applies when a task does not choose a connection count.",
     "countUser": "Count",
     "anonymous": "Anonymous user group",
     "sysGroup": "System user group",
@@ -1256,6 +1258,8 @@
     "allowRemoteDownload": "Remote download",
     "allowRemoteDownloadDes": "Whether to allow users to create remote download tasks. If you need to use remote download, you also need to have nodes with remote download enabled in the <0>Node List</0>.",
     "downloaderOptions": "Downloader job options",
+    "gopeedDefaultConnections": "Default HTTP connections",
+    "gopeedDefaultConnectionsDes": "Optional, 1–256. This safe default applies when a task and its group do not specify a connection count.",
     "downloaderOptionsDes": "Extra parameters for the selected downloader, written in JSON key-value format. See its official documentation for available parameters.",
     "remoteDownloadBatchSize": "Max batch size of remote download tasks",
     "remoteDownloadBatchSizeDes": "Max number for submitting batched remote download tasks, fill in 0 to indicate no limit.",

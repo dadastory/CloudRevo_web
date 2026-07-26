@@ -30,7 +30,11 @@ import { ViewTaskAction } from "../../Common/Snackbar/snackbar.tsx";
 import DraggableDialog from "../../Dialogs/DraggableDialog.tsx";
 import Link from "../../Icons/Link.tsx";
 import { FileManagerIndex } from "../FileManager.tsx";
-import { classifyRemoteDownloadSource, supportsHTTPTaskControls } from "./remoteDownloadSource.ts";
+import {
+  classifyRemoteDownloadSource,
+  requiresRemoteDownloadPreflight,
+  supportsHTTPTaskControls,
+} from "./remoteDownloadSource.ts";
 import { remoteDownloadPreflightErrorMessage } from "./remoteDownloadPreflight.ts";
 
 const CreateRemoteDownload = () => {
@@ -131,10 +135,14 @@ const CreateRemoteDownload = () => {
     if (gopeed === null) return;
 
     const sources = sourceLines;
-    if (!preview && !target && sources.length == 1 && sourceKind != "torrent-url") {
+    if (!preview && !target && sources.length == 1 && requiresRemoteDownloadPreflight(sources[0])) {
       setLoading(true);
       dispatch(sendPreviewRemoteDownload({ src: sources, dst: path, request, gopeed }, true))
         .then((result) => {
+          if (!result.files?.length) {
+            enqueueSnackbar({ message: t("modals.remoteDownloadPreviewNoFiles"), variant: "error" });
+            return;
+          }
           setPreview(result);
           setSelectedFiles(result.files?.map((file) => file.index) ?? []);
         })
@@ -212,7 +220,9 @@ const CreateRemoteDownload = () => {
           ? t("modals.remoteDownloadStart")
           : target || url.split("\n").filter(Boolean).length != 1
             ? t("common:ok")
-            : t("modals.remoteDownloadPreview")
+            : requiresRemoteDownloadPreflight(sourceLines[0])
+              ? t("modals.remoteDownloadPreview")
+              : t("modals.remoteDownloadStart")
       }
       showCancel
       onAccept={onAccept}
@@ -286,6 +296,11 @@ const CreateRemoteDownload = () => {
               {!target && sourceKind == "torrent-url" && (
                 <Alert severity="info" variant="outlined">
                   {t("modals.remoteDownloadTorrentInfo")}
+                </Alert>
+              )}
+              {!target && sourceKind == "ed2k" && (
+                <Alert severity="info" variant="outlined">
+                  {t("modals.remoteDownloadED2KInfo")}
                 </Alert>
               )}
               {!target && showHTTPTaskControls && (

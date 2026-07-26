@@ -57,6 +57,20 @@ describe("Gopeed offline-download workbench", () => {
     expect(files).toContain('transition: "background-size');
   });
 
+  it("lets the owner pause and continue a live Gopeed task without replacing it", () => {
+    const list = source("component/Pages/Tasks/DownloadList.tsx");
+    const card = source("component/Pages/Tasks/TaskCard.tsx");
+    const api = source("api/api.ts");
+
+    expect(list).toContain("sendPauseDownloadTask");
+    expect(list).toContain("sendContinueDownloadTask");
+    expect(list).toContain("DownloadTaskState.paused");
+    expect(card).toContain("download.pauseTask");
+    expect(card).toContain("download.continueTask");
+    expect(api).toContain('"/workflow/download/" + id + "/pause"');
+    expect(api).toContain('"/workflow/download/" + id + "/continue"');
+  });
+
   it("reconnects task events and coalesces refreshes without overlapping requests", () => {
     const list = source("component/Pages/Tasks/DownloadList.tsx");
 
@@ -93,5 +107,24 @@ describe("Gopeed offline-download workbench", () => {
     expect(dialog).toContain("gopeed");
     expect(dialog).toContain("display_name: preview?.name");
     expect(workflow).toContain("RemoteDownloadTaskOptions");
+  });
+
+  it("does not present an empty preflight as a selectable success and keeps filtered progress aligned", () => {
+    const dialog = source("component/FileManager/Dialogs/CreateRemoteDownload.tsx");
+    const files = source("component/Pages/Tasks/DownloadFileList.tsx");
+
+    expect(dialog).toContain("remoteDownloadPreviewNoFiles");
+    expect(dialog).toContain("if (!result.files?.length)");
+    expect(files).toContain("fileProgressDetails(filteredFiles[index])");
+  });
+
+  it("uses constrained Gopeed connection controls instead of a raw option editor", () => {
+    const group = source("component/Admin/Group/EditGroup/FileManagementSection.tsx");
+    const node = source("component/Admin/Node/EditNode/CapabilitiesSection.tsx");
+
+    expect(group).toContain("gopeedDefaultConnections");
+    expect(node).toContain("gopeedDefaultConnections");
+    expect(group).not.toContain("onEditedConfigBlur");
+    expect(node).not.toContain("onEditedConfigGopeedBlur");
   });
 });

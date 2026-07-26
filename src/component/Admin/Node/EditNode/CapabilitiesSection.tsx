@@ -39,7 +39,6 @@ const CapabilitiesSection = () => {
   const dispatch = useAppDispatch();
   const { enqueueSnackbar } = useSnackbar();
 
-  const [editedConfigGopeed, setEditedConfigGopeed] = useState("");
   const [editedConfigQbittorrent, setEditedConfigQbittorrent] = useState("");
   const [testDownloaderLoading, setTestDownloaderLoading] = useState(false);
   const [storeFilesHintDialogOpen, setStoreFilesHintDialogOpen] = useState(false);
@@ -51,12 +50,6 @@ const CapabilitiesSection = () => {
   const hasRemoteDownload = useMemo(() => {
     return capabilities.enabled(NodeCapability.remote_download);
   }, [capabilities]);
-
-  useEffect(() => {
-    setEditedConfigGopeed(
-      values.settings?.gopeed?.options ? JSON.stringify(values.settings?.gopeed?.options, null, 2) : "",
-    );
-  }, [values.settings?.gopeed?.options]);
 
   useEffect(() => {
     setEditedConfigQbittorrent(
@@ -309,20 +302,14 @@ const CapabilitiesSection = () => {
     [urlValidation?.allowed_cidrs],
   );
 
-  const onEditedConfigGopeedBlur = useCallback(
-    (value: string) => {
-      var res: Record<string, any> | undefined = undefined;
-      if (value) {
-        try {
-          res = JSON.parse(value);
-        } catch (e) {
-          console.error(e);
-        }
-      }
-      setNode((p: Node) => ({ ...p, settings: { ...p.settings, gopeed: { ...p.settings?.gopeed, options: res } } }));
-    },
-    [editedConfigGopeed, setNode],
-  );
+  const onGopeedConnectionsChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const connections = Number(e.target.value);
+    const valid = Number.isInteger(connections) && connections >= 1 && connections <= 256;
+    setNode((p: Node) => ({
+      ...p,
+      settings: { ...p.settings, gopeed: { ...p.settings?.gopeed, options: valid ? { connections } : undefined } },
+    }));
+  }, [setNode]);
 
   const onEditedConfigQbittorrentBlur = useCallback(
     (value: string) => {
@@ -495,33 +482,14 @@ const CapabilitiesSection = () => {
                     <NoMarginHelperText>{t("node.gopeedComposeTokenDes")}</NoMarginHelperText>
                   </FormControl>
                 </SettingForm>
-                <SettingForm title={t("group.downloaderOptions")} lgWidth={5}>
+                <SettingForm title={t("node.gopeedDefaultConnections")} lgWidth={5}>
                   <FormControl fullWidth>
-                    <Suspense fallback={<CircularProgress />}>
-                      <MonacoEditor
-                        theme={theme.palette.mode === "dark" ? "vs-dark" : "vs"}
-                        language="json"
-                        value={editedConfigGopeed}
-                        onChange={(value) => setEditedConfigGopeed(value || "")}
-                        onBlur={onEditedConfigGopeedBlur}
-                        height="200px"
-                        minHeight="200px"
-                        options={{
-                          wordWrap: "on",
-                          minimap: { enabled: false },
-                          scrollBeyondLastLine: false,
-                        }}
-                      />
-                    </Suspense>
-                    <NoMarginHelperText>
-                      <Trans
-                        i18nKey="node.downloaderOptionDes"
-                        ns="dashboard"
-                        components={[
-                          <Link href="https://github.com/GopeedLab/gopeed/blob/main/docs/usage.md" target="_blank" />,
-                        ]}
-                      />
-                    </NoMarginHelperText>
+                    <DenseFilledTextField
+                      slotProps={{ htmlInput: { type: "number", min: 1, max: 256 } }}
+                      value={values.settings?.gopeed?.options?.connections ?? ""}
+                      onChange={onGopeedConnectionsChange}
+                    />
+                    <NoMarginHelperText>{t("node.gopeedDefaultConnectionsDes")}</NoMarginHelperText>
                   </FormControl>
                 </SettingForm>
                 <SettingForm title={t("node.gopeedDownloadPath")} lgWidth={5}>

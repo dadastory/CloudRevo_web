@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   classifyRemoteDownloadSource,
+  requiresRemoteDownloadPreflight,
   supportsHTTPTaskControls,
 } from "../src/component/FileManager/Dialogs/remoteDownloadSource.ts";
 
@@ -13,5 +14,12 @@ describe("remote download source classification", () => {
     expect(supportsHTTPTaskControls("https://downloads.example.test/release.iso")).toBe(true);
     expect(supportsHTTPTaskControls("https://downloads.example.test/release.torrent")).toBe(false);
     expect(supportsHTTPTaskControls("magnet:?xt=urn:btih:fixture")).toBe(false);
+  });
+
+  it("queues eD2K directly instead of requesting unusable preview metadata", () => {
+    expect(requiresRemoteDownloadPreflight("https://downloads.example.test/release.iso")).toBe(true);
+    expect(requiresRemoteDownloadPreflight("magnet:?xt=urn:btih:fixture")).toBe(true);
+    expect(requiresRemoteDownloadPreflight("https://downloads.example.test/release.torrent")).toBe(false);
+    expect(requiresRemoteDownloadPreflight("ed2k://|file|fixture.iso|1|0123456789abcdef0123456789abcdef|/")).toBe(false);
   });
 });

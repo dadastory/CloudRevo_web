@@ -182,7 +182,7 @@ export interface QBittorrentSetting {
 export interface GopeedSetting {
   server?: string;
   token?: string;
-  options?: Record<string, string>;
+  options?: Record<string, string | number>;
   download_path?: string;
   temp_path?: string;
 }

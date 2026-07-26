@@ -17,7 +17,7 @@ export interface TaskResponse {
   created_at: string;
   updated_at: string;
   id: string;
-  status: string;
+  status: TaskStatus;
   type: string;
   node?: NodeSummary;
   summary?: TaskSummary;
@@ -43,8 +43,10 @@ export interface TaskSummary {
 }
 
 export enum DownloadTaskState {
+  waiting = "waiting",
   seeding = "seeding",
   downloading = "downloading",
+  paused = "paused",
   error = "error",
   completed = "completed",
   unknown = "unknown",
